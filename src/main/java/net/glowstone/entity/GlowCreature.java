@@ -16,7 +16,7 @@ import java.util.List;
  * Represents a monster such as a creeper.
  * @author Graham Edgecombe
  */
-public final class GlowCreature extends GlowLivingEntity implements Creature {
+public class GlowCreature extends GlowLivingEntity implements Creature {
 
     /**
      * The type of monster.

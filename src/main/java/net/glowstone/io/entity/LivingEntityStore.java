@@ -137,20 +137,22 @@ abstract class LivingEntityStore<T extends GlowLivingEntity> extends EntityStore
         tag.putCompoundList("ActiveEffects", effects);
 
         EntityEquipment equip = entity.getEquipment();
-        tag.putCompoundList("Equipment", Arrays.asList(
-                NbtSerialization.writeItem(equip.getItemInHand(), -1),
-                NbtSerialization.writeItem(equip.getBoots(), -1),
-                NbtSerialization.writeItem(equip.getLeggings(), -1),
-                NbtSerialization.writeItem(equip.getChestplate(), -1),
-                NbtSerialization.writeItem(equip.getHelmet(), -1)
-        ));
-        tag.putList("DropChances", TagType.FLOAT, Arrays.<Float>asList(
-                equip.getItemInHandDropChance(),
-                equip.getBootsDropChance(),
-                equip.getLeggingsDropChance(),
-                equip.getChestplateDropChance(),
-                equip.getHelmetDropChance()
-        ));
+        if (equip != null) {
+            tag.putCompoundList("Equipment", Arrays.asList(
+                    NbtSerialization.writeItem(equip.getItemInHand(), -1),
+                    NbtSerialization.writeItem(equip.getBoots(), -1),
+                    NbtSerialization.writeItem(equip.getLeggings(), -1),
+                    NbtSerialization.writeItem(equip.getChestplate(), -1),
+                    NbtSerialization.writeItem(equip.getHelmet(), -1)
+            ));
+            tag.putList("DropChances", TagType.FLOAT, Arrays.<Float>asList(
+                    equip.getItemInHandDropChance(),
+                    equip.getBootsDropChance(),
+                    equip.getLeggingsDropChance(),
+                    equip.getChestplateDropChance(),
+                    equip.getHelmetDropChance()
+            ));
+        }
         tag.putBool("CanPickUpLoot", entity.getCanPickupItems());
     }
 }

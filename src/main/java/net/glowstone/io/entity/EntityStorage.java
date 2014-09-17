@@ -1,7 +1,13 @@
 package net.glowstone.io.entity;
 
 import net.glowstone.GlowWorld;
+import net.glowstone.entity.GlowAgeable;
+import net.glowstone.entity.animals.GlowChicken;
+import net.glowstone.entity.animals.GlowCow;
 import net.glowstone.entity.GlowEntity;
+import net.glowstone.entity.animals.GlowMushroomCow;
+import net.glowstone.entity.animals.GlowOcelot;
+import net.glowstone.entity.animals.GlowPig;
 import net.glowstone.io.nbt.NbtSerialization;
 import net.glowstone.util.nbt.CompoundTag;
 import org.bukkit.Location;
@@ -37,6 +43,14 @@ public final class EntityStorage {
     static {
         bind(new PlayerStore());
         bind(new ItemStore());
+        bind(new AgeableStore<>(GlowChicken.class, "Chicken"));
+        bind(new AgeableStore<>(GlowCow.class, "Cow"));
+        bind(new HorseStore());
+        bind(new AgeableStore<>(GlowMushroomCow.class, "MushroomCow"));
+        bind(new PigStore());
+        bind(new SheepStore());
+        bind(new ZombieStore());
+        bind(new PaintingStore());
     }
 
     /**

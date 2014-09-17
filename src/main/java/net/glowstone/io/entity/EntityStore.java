@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 abstract class EntityStore<T extends GlowEntity> {
     private final String id;
-    private final Class<T> clazz;
+    protected final Class<T> clazz;
 
     public EntityStore(Class<T> clazz, String id) {
         this.id = id;
@@ -57,7 +57,10 @@ abstract class EntityStore<T extends GlowEntity> {
         // base stuff for all entities is here:
 
         if (tag.isList("Motion", TagType.DOUBLE)) {
-            entity.setVelocity(NbtSerialization.listToVector(tag.<Double>getList("Motion", TagType.DOUBLE)));
+            entity.setVelocity(
+                    NbtSerialization.listToVector(
+                            tag.<Double>getList("Motion",
+                                    TagType.DOUBLE)));
         }
         if (tag.isFloat("FallDistance")) {
             entity.setFallDistance(tag.getFloat("FallDistance"));

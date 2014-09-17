@@ -3,13 +3,19 @@ package net.glowstone;
 import net.glowstone.block.GlowBlock;
 import net.glowstone.constants.GlowBiome;
 import net.glowstone.entity.*;
+import net.glowstone.entity.animals.GlowChicken;
+import net.glowstone.entity.animals.GlowCow;
+import net.glowstone.entity.animals.GlowMushroomCow;
+import net.glowstone.entity.monsters.GlowCreeper;
 import net.glowstone.entity.objects.GlowItem;
+import net.glowstone.entity.objects.GlowPainting;
 import net.glowstone.io.WorldMetadataService.WorldFinalValues;
 import net.glowstone.io.WorldStorageProvider;
 import net.glowstone.io.anvil.AnvilWorldStorageProvider;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
@@ -937,7 +943,32 @@ public final class GlowWorld implements World {
 
     @Override
     public <T extends Entity> T spawn(Location location, Class<T> clazz) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Entity entity = null;
+        // TODO make this more versatile and accepting of custom entity classes.
+        if (Projectile.class.isAssignableFrom(clazz)) {
+            // Do stuff
+            throw new UnsupportedOperationException("Not implemented yet");
+        } else if (LivingEntity.class.isAssignableFrom(clazz)) {
+            if (Chicken.class.isAssignableFrom(clazz)) {
+                entity = new GlowChicken(location);
+            } else if (Cow.class.isAssignableFrom(clazz)) {
+                if (MushroomCow.class.isAssignableFrom(clazz)) {
+                    entity = new GlowMushroomCow(location);
+                } else {
+                    entity = new GlowCow(location);
+                }
+            } else if (Golem.class.isAssignableFrom(clazz)) {
+                if (Snowman.class.isAssignableFrom(clazz)) {
+                    throw new UnsupportedOperationException("Not implemented yet");
+                }
+            } else if (Creeper.class.isAssignableFrom(clazz)) {
+                entity = new GlowCreeper(location);
+            }
+        } else if (Painting.class.isAssignableFrom(clazz)) {
+            entity = new GlowPainting(location, Art.KEBAB, BlockFace.SOUTH);
+        }
+        //return null;
+        return (T)entity;
     }
 
     @Override

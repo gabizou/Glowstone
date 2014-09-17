@@ -65,7 +65,7 @@ public class BlockLever extends BlockType {
         if (data instanceof Lever) {
             final Lever l = (Lever) data;
             setAttachedFace(l, face.getOppositeFace());
-            l.setFacingDirection(face == BlockFace.UP || face == BlockFace.DOWN ? player.getDirection() : face);
+            l.setFacingDirection(face == BlockFace.UP || face == BlockFace.DOWN ? player.getFacingDirection() : face);
             state.setData(l);
         } else {
             warnMaterialData(Lever.class, data);

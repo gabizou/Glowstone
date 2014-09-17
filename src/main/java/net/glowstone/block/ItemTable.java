@@ -1,6 +1,8 @@
 package net.glowstone.block;
 
 import net.glowstone.block.blocktype.*;
+import net.glowstone.block.itemtype.ItemMonsterEgg;
+import net.glowstone.block.itemtype.ItemPainting;
 import net.glowstone.block.itemtype.ItemPlaceAs;
 import net.glowstone.block.itemtype.ItemSign;
 import net.glowstone.block.itemtype.ItemType;
@@ -119,6 +121,8 @@ public final class ItemTable {
         reg(Material.FLOWER_POT_ITEM, new ItemPlaceAs(Material.FLOWER_POT));
         reg(Material.SKULL_ITEM, new ItemPlaceAs(Material.SKULL));
         reg(Material.REDSTONE_COMPARATOR, new ItemPlaceAs(Material.REDSTONE_COMPARATOR_OFF));
+        reg(Material.MONSTER_EGG, new ItemMonsterEgg());
+        reg(Material.PAINTING, new ItemPainting());
     }
 
     private void reg(Material material, ItemType type) {
