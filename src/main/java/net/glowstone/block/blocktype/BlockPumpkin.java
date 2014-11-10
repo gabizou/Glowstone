@@ -10,6 +10,7 @@ import net.glowstone.entity.GlowPlayer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Snowman;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockPumpkin extends BlockType {
@@ -26,7 +27,10 @@ public class BlockPumpkin extends BlockType {
         if (block.getLocation().add(0, -1, 0).getBlock().getType().equals(Material.SNOW_BLOCK)) {
             if (block.getLocation().add(0, -2, 0).getBlock().getType().equals(Material.SNOW_BLOCK)) {
                 Location snowmanLocation = block.getLocation().add(0, -2, 0);
-
+                block.getWorld().spawn(snowmanLocation, Snowman.class);
+                block.setType(Material.AIR);
+                block.getLocation().add(0, -1, 0).getBlock().setType(Material.AIR);
+                block.getLocation().add(0, -2, 0).getBlock().setType(Material.AIR);
             }
         }
     }
