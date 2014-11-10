@@ -15,7 +15,6 @@ public class CreeperStore extends MonsterStore<GlowCreeper> {
         if (compound.containsKey("powered")) {
             entity.setPowered(compound.getBool("powered"));
         }
-        /* TODO add necessary method hooks for these various things
         if (compound.containsKey("Fuse")) {
             entity.setFuse(compound.getShort("Fuse"));
         }
@@ -23,9 +22,8 @@ public class CreeperStore extends MonsterStore<GlowCreeper> {
             entity.setExplosionRadius(compound.getByte("ExplosionRadius"));
         }
         if (compound.containsKey("Ignited")) {
-            entity.setIsIgnited(compound.getBool("ignited"));
+            entity.setIgnited(compound.getBool("ignited"));
         }
-        */
     }
 
     @Override

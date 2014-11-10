@@ -7,8 +7,17 @@ import org.bukkit.entity.Ghast;
 
 public class GlowGhast extends GlowFlying implements Ghast {
 
+    private int explosionPower;
+
     public GlowGhast(Location location) {
         super(location, EntityType.GHAST);
     }
 
+    public void setExplosionPower(int explosionPower) {
+        this.explosionPower = explosionPower;
+    }
+
+    public int getExplosionPower() {
+        return explosionPower;
+    }
 }

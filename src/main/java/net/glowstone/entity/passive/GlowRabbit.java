@@ -2,7 +2,6 @@ package net.glowstone.entity.passive;
 
 import com.flowpowered.networking.Message;
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableMap;
 import net.glowstone.entity.GlowAnimal;
 import net.glowstone.entity.meta.MetadataIndex;
 import net.glowstone.entity.meta.MetadataMap;
@@ -13,7 +12,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Rabbit;
 
 import java.util.List;
-import java.util.Map;
 
 public class GlowRabbit extends GlowAnimal implements Rabbit {
 

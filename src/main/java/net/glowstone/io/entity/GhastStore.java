@@ -18,13 +18,13 @@ public class GhastStore extends LivingEntityStore<GlowGhast> {
     @Override
     public void load(GlowGhast entity, CompoundTag compound) {
         super.load(entity, compound);
-        // TODO entity.setExplosionPower(compound.getInt("ExplosionPower");
+        entity.setExplosionPower(compound.getInt("ExplosionPower"));
 
     }
 
     @Override
     public void save(GlowGhast entity, CompoundTag tag) {
         super.save(entity, tag);
-        // TODO tag.putInt("ExplosionPower", entity.getExplosionPower());
+        tag.putInt("ExplosionPower", entity.getExplosionPower());
     }
 }

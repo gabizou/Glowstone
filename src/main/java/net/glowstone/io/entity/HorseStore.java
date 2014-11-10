@@ -43,7 +43,6 @@ class HorseStore extends AgeableStore<GlowHorse> {
         entity.setEatingHay(compound.getBool(EATING_HAYSTACK_KEY));
         entity.setCarryingChest(compound.getBool(CHESTED_HORSE_KEY));
         entity.setHasReproduced(compound.getBool(HAS_REPRODUCED_KEY));
-        // TODO Fix this to work with Mojang's style of saving.
         entity.setStyle(Style.values()[compound.getInt(VARIANT_KEY) >>> 8]);
         entity.setColor(Horse.Color.values()[compound.getInt(VARIANT_KEY) & 0xFF]);
         entity.setVariant(Variant.values()[compound.getInt(TYPE_KEY)]);
@@ -79,7 +78,6 @@ class HorseStore extends AgeableStore<GlowHorse> {
         tag.putBool(CHESTED_HORSE_KEY, entity.isCarryingChest());
         tag.putBool(HAS_REPRODUCED_KEY, entity.hasReproduced());
         tag.putBool(BRED_KEY, true);
-        // TODO Fix this to work with Mojang's style of saving.
         tag.putInt(VARIANT_KEY, entity.getStyle().ordinal() << 8 | entity.getColor().ordinal() & 0xFF);
         tag.putInt(TYPE_KEY, entity.getVariant().ordinal());
         tag.putBool(SADDLE_KEY, entity.getInventory().getSaddle() != null);
