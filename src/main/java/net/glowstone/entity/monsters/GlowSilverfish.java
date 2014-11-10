@@ -7,7 +7,6 @@ import org.bukkit.entity.Silverfish;
 
 public class GlowSilverfish extends GlowMonster implements Silverfish {
 
-
     public GlowSilverfish(Location location) {
         super(location, EntityType.SILVERFISH);
     }

@@ -7,7 +7,6 @@ import org.bukkit.entity.Giant;
 
 public class GlowGiant extends GlowMonster implements Giant {
 
-
     public GlowGiant(Location location) {
         super(location, EntityType.GIANT);
     }

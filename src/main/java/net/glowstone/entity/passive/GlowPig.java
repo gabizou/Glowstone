@@ -15,11 +15,6 @@ public class GlowPig extends GlowAnimal implements Pig {
 
     private boolean hasSaddle;
 
-    /**
-     * Creates a new Pig.
-     *
-     * @param location The location of the monster.
-     */
     public GlowPig(Location location) {
         super(location, EntityType.PIG);
         setSize(0.9F, 0.9F);

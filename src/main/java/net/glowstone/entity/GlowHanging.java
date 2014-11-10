@@ -38,8 +38,6 @@ public abstract class GlowHanging extends GlowEntity implements Hanging {
         return this.entityType;
     }
 
-
-
     @Override
     public boolean setFacingDirection(BlockFace blockFace, boolean force) {
         if (blockFace == BlockFace.NORTH || blockFace == BlockFace.SOUTH || blockFace == BlockFace.WEST || blockFace == BlockFace.EAST) {

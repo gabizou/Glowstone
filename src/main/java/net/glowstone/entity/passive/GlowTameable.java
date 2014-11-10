@@ -17,7 +17,7 @@ public abstract class GlowTameable extends GlowAnimal implements Tameable {
 
     private UUID ownerUUId;
 
-    private boolean isTamed;
+    private boolean tamed;
 
     /**
      * Creates a new tamed animal.
@@ -44,12 +44,12 @@ public abstract class GlowTameable extends GlowAnimal implements Tameable {
 
     @Override
     public boolean isTamed() {
-        return isTamed;
+        return tamed;
     }
 
     @Override
     public void setTamed(boolean isTamed) {
-        this.isTamed = isTamed;
+        this.tamed = isTamed;
     }
 
     @Override

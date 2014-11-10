@@ -14,15 +14,10 @@ import java.util.List;
 
 public class GlowSheep extends GlowAnimal implements Sheep {
 
-    private boolean isSheared = false;
+    private boolean sheared = false;
 
     private DyeColor color = DyeColor.WHITE;
 
-    /**
-     * Creates a new Sheep.
-     *
-     * @param location The location of the monster
-     */
     public GlowSheep(Location location) {
         super(location, EntityType.SHEEP);
         setSize(0.9F, 1.3F);
@@ -30,12 +25,12 @@ public class GlowSheep extends GlowAnimal implements Sheep {
 
     @Override
     public boolean isSheared() {
-        return isSheared;
+        return sheared;
     }
 
     @Override
     public void setSheared(boolean sheared) {
-        this.isSheared = sheared;
+        this.sheared = sheared;
     }
 
     @Override
@@ -59,6 +54,6 @@ public class GlowSheep extends GlowAnimal implements Sheep {
     }
 
     private byte getColorByte() {
-        return (byte) (this.getColor().getData() & (isSheared ? 0x10 : 0x0F));
+        return (byte) (this.getColor().getData() & (sheared ? 0x10 : 0x0F));
     }
 }

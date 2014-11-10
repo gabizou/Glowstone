@@ -7,7 +7,6 @@ import org.bukkit.entity.Wither;
 
 public class GlowWither extends GlowMonster implements Wither {
 
-
     public GlowWither(Location location) {
         super(location, EntityType.WITHER);
     }

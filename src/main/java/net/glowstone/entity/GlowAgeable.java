@@ -11,13 +11,13 @@ import org.bukkit.entity.EntityType;
 import java.util.List;
 
 /**
- * Represents a monster such as a creeper.
- * @author Graham Edgecombe
+ * Represents a creature that ages, such as a sheep.
  */
 public class GlowAgeable extends GlowCreature implements Ageable {
 
     private static final int AGE_BABY = -24000;
     private static final int AGE_ADULT = 0;
+    private static final int BREEDING_AGE = 6000;
     protected float width, height;
     private int age = 0;
     private boolean ageLocked = false;
@@ -98,7 +98,7 @@ public class GlowAgeable extends GlowCreature implements Ageable {
         if (breed) {
             setAge(AGE_ADULT);
         } else if (isAdult()) {
-            setAge(6000);
+            setAge(BREEDING_AGE);
         }
     }
 

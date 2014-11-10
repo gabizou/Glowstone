@@ -8,7 +8,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 public class GlowArrow extends GlowProjectile implements Arrow {
 
-    private boolean isCritical;
+    private boolean critical;
 
     private int knockbackStrength;
 
@@ -32,11 +32,11 @@ public class GlowArrow extends GlowProjectile implements Arrow {
 
     @Override
     public boolean isCritical() {
-        return isCritical;
+        return critical;
     }
 
     @Override
     public void setCritical(boolean isCritical) {
-        this.isCritical = isCritical;
+        this.critical = isCritical;
     }
 }

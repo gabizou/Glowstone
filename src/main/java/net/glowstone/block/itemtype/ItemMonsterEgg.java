@@ -8,9 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.SpawnEgg;
 import org.bukkit.util.Vector;
 
-/**
- * Base class for specific types of items.
- */
 public class ItemMonsterEgg extends ItemType {
 
     @Override

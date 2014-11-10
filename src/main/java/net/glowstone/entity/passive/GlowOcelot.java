@@ -17,21 +17,10 @@ public class GlowOcelot extends GlowTameable implements Ocelot {
 
     private Type ocelotType = Type.WILD_OCELOT;
 
-    /**
-     * Creates a new tamed animal.
-     *
-     * @param location The location of the animal
-     */
     public GlowOcelot(Location location) {
-        super(location, EntityType.OCELOT);
+        this(location, null);
     }
 
-    /**
-     * Creates a new tamed animal.
-     *
-     * @param location The location of the animal
-     * @param owner    The owner of the animal
-     */
     protected GlowOcelot(Location location, AnimalTamer owner) {
         super(location, EntityType.OCELOT, owner);
     }

@@ -21,11 +21,6 @@ public class GlowSlime extends GlowLivingEntity implements Slime {
     private int size = 0;
     private EntityType type;
 
-    /**
-     * Creates a new ageable animal.
-     * @param location The location of the animal.
-     * @param type The type of animal.
-     */
     protected GlowSlime(Location location, EntityType type) {
         this(location);
         this.type = type;

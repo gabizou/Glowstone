@@ -14,49 +14,38 @@ import java.util.List;
 
 public class GlowWolf extends GlowTameable implements Wolf {
 
-    private boolean isAngry = false;
+    private boolean angry = false;
 
-    private boolean isSitting = false;
+    private boolean sitting = false;
 
     private DyeColor collarColor = DyeColor.RED;
 
-    /**
-     * Creates a new tamed animal.
-     *
-     * @param location The location of the animal
-     */
     public GlowWolf(Location location) {
-        super(location, EntityType.WOLF);
+        this(location, null);
     }
 
-    /**
-     * Creates a new tamed animal.
-     *
-     * @param location The location of the animal
-     * @param owner    The owner of the animal
-     */
     protected GlowWolf(Location location, AnimalTamer owner) {
         super(location, EntityType.WOLF, owner);
     }
 
     @Override
     public boolean isAngry() {
-        return isAngry;
+        return angry;
     }
 
     @Override
     public void setAngry(boolean angry) {
-        this.isAngry = angry;
+        this.angry = angry;
     }
 
     @Override
     public boolean isSitting() {
-        return isSitting;
+        return sitting;
     }
 
     @Override
     public void setSitting(boolean sitting) {
-        this.isSitting = sitting;
+        this.sitting = sitting;
     }
 
     @Override

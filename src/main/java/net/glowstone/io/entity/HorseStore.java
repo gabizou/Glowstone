@@ -77,7 +77,7 @@ class HorseStore extends AgeableStore<GlowHorse> {
         super.save(entity, tag);
         tag.putBool(EATING_HAYSTACK_KEY, entity.isEatingHay());
         tag.putBool(CHESTED_HORSE_KEY, entity.isCarryingChest());
-        tag.putBool(HAS_REPRODUCED_KEY, entity.isHasReproduced());
+        tag.putBool(HAS_REPRODUCED_KEY, entity.hasReproduced());
         tag.putBool(BRED_KEY, true);
         // TODO Fix this to work with Mojang's style of saving.
         tag.putInt(VARIANT_KEY, entity.getStyle().ordinal() << 8 | entity.getColor().ordinal() & 0xFF);

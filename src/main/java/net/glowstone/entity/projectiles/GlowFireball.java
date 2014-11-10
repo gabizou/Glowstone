@@ -13,7 +13,6 @@ public abstract class GlowFireball extends GlowProjectile implements Fireball {
 
     private float yield;
 
-
     public GlowFireball(Location location, EntityType type, ProjectileSource shooter) {
         super(location, type, shooter);
     }

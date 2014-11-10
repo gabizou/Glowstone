@@ -7,7 +7,6 @@ import org.bukkit.entity.EntityType;
 
 public class GlowBlaze extends GlowMonster implements Blaze {
 
-
     public GlowBlaze(Location location) {
         super(location, EntityType.BLAZE);
     }

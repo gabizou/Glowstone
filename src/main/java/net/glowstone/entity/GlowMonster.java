@@ -6,7 +6,6 @@ import org.bukkit.entity.Monster;
 
 /**
  * Represents a monster such as a creeper.
- * @author Graham Edgecombe
  */
 public class GlowMonster extends GlowCreature implements Monster {
 

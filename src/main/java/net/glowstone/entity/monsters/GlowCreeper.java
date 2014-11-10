@@ -9,7 +9,6 @@ public class GlowCreeper extends GlowMonster implements Creeper {
 
     private boolean isPowered = false;
 
-
     public GlowCreeper(Location location) {
         super(location, EntityType.CREEPER);
     }

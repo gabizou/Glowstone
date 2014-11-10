@@ -1,6 +1,7 @@
 package net.glowstone.entity.passive;
 
 import com.flowpowered.networking.Message;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import net.glowstone.entity.GlowAnimal;
 import net.glowstone.entity.meta.MetadataIndex;
@@ -16,17 +17,7 @@ import java.util.Map;
 
 public class GlowRabbit extends GlowAnimal implements Rabbit {
 
-
-    private static final Map<Integer, RabbitType> rabbitTypeMap = ImmutableMap.<Integer, Rabbit.RabbitType>builder()
-            .put(0, Rabbit.RabbitType.BROWN)
-            .put(1, Rabbit.RabbitType.WHITE)
-            .put(2, Rabbit.RabbitType.BLACK)
-            .put(3, Rabbit.RabbitType.BLACK_AND_WHITE)
-            .put(4, Rabbit.RabbitType.GOLD)
-            .put(5, Rabbit.RabbitType.SALT_PEPPER)
-            .put(99, Rabbit.RabbitType.KILLER)
-            .build();
-    private static final Map<Rabbit.RabbitType, Integer> rabbitTypeIntegerMap = ImmutableMap.<Rabbit.RabbitType, Integer>builder()
+    private static final ImmutableBiMap<RabbitType, Integer> rabbitTypeIntegerMap = ImmutableBiMap.<RabbitType, Integer>builder()
             .put(Rabbit.RabbitType.BROWN, 0)
             .put(Rabbit.RabbitType.WHITE, 1)
             .put(Rabbit.RabbitType.BLACK, 2)
@@ -38,11 +29,6 @@ public class GlowRabbit extends GlowAnimal implements Rabbit {
 
     private RabbitType rabbitType = RabbitType.BROWN;
 
-    /**
-     * Creates a new Chicken.
-     *
-     * @param location The location of the monster.
-     */
     public GlowRabbit(Location location) {
         super(location, EntityType.RABBIT);
         setSize(0.3F, 0.7F);
@@ -57,7 +43,6 @@ public class GlowRabbit extends GlowAnimal implements Rabbit {
     public void setRabbitType(RabbitType type) {
         Validate.notNull(type, "Cannot set a null rabbit type!");
         this.rabbitType = type;
-
     }
 
     @Override

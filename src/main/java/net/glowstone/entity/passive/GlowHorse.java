@@ -42,26 +42,10 @@ public class GlowHorse extends GlowTameable implements Horse {
 
     private HorseInventory inventory = new GlowHorseInventory(this);
 
-    /**
-     * Creates a new tamed animal.
-     *
-     * @param location The location of the animal
-     */
     public GlowHorse(Location location) {
-        super(location, EntityType.HORSE);
-        Random rand = new Random();
-        // Todo make this cleaner and safer to use for spawning random horses
-        this.variant = Variant.HORSE;
-        this.horseStyle = Style.values()[rand.nextInt(4)];
-        this.horseColor = Color.values()[rand.nextInt(6)];
+        this(location, null);
     }
 
-    /**
-     * Creates a new tamed animal.
-     *
-     * @param location The location of the animal
-     * @param owner    The owner of the animal
-     */
     protected GlowHorse(Location location, AnimalTamer owner) {
         super(location, EntityType.HORSE, owner);
         this.ownerUUID = owner.getUniqueId();
@@ -110,7 +94,7 @@ public class GlowHorse extends GlowTameable implements Horse {
     @Override
     public void setCarryingChest(boolean b) {
         if (b) {
-//            this.inventory.setSi
+           // TODO Manipulate the HorseInventory somehow
         }
         this.hasChest = b;
     }
@@ -162,7 +146,7 @@ public class GlowHorse extends GlowTameable implements Horse {
         this.eatingHay = eatingHay;
     }
 
-    public boolean isHasReproduced() {
+    public boolean hasReproduced() {
         return hasReproduced;
     }
 

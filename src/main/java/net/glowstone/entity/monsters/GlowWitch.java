@@ -7,7 +7,6 @@ import org.bukkit.entity.Witch;
 
 public class GlowWitch extends GlowMonster implements Witch {
 
-
     public GlowWitch(Location location) {
         super(location, EntityType.WITCH);
     }
