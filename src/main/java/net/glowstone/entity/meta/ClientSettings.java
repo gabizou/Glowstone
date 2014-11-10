@@ -109,11 +109,11 @@ public final class ClientSettings {
     @Override
     public String toString() {
         return "ClientSettings{" +
-                "locale='" + locale + '\'' +
-                ", viewDistance=" + viewDistance +
-                ", chatFlags=" + chatFlags +
-                ", chatColors=" + chatColors +
-                ", skinFlags=" + skinFlags +
-                '}';
+               "locale='" + locale + '\'' +
+               ", viewDistance=" + viewDistance +
+               ", chatFlags=" + chatFlags +
+               ", chatColors=" + chatColors +
+               ", skinFlags=" + skinFlags +
+               '}';
     }
 }

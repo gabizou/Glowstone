@@ -252,6 +252,7 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
      */
     public GlowPlayer(GlowSession session, PlayerProfile profile, PlayerDataService.PlayerReader reader) {
         super(initLocation(session, reader), profile);
+        setBoundingBox(0.6, 1.8);
         this.session = session;
 
         chunkLock = world.newChunkLock(getName());
@@ -273,7 +274,8 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
         if (server.isHardcore()) {
             gameMode |= 0x8;
         }
-        session.send(new JoinGameMessage(SELF_ID, gameMode, world.getEnvironment().getId(), world.getDifficulty().getValue(), session.getServer().getMaxPlayers(), type, false));
+        session.send(new JoinGameMessage(SELF_ID, gameMode, world.getEnvironment().getId(), world.getDifficulty().getValue(),
+                                         session.getServer().getMaxPlayers(), type, false));
         setAllowFlight(getGameMode() == GameMode.CREATIVE);
 
         // send server brand and supported plugin channels
@@ -414,8 +416,9 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
 
         // add entities
         for (GlowEntity entity : world.getEntityManager()) {
-            if (entity == this)
+            if (entity == this) {
                 continue;
+            }
             boolean withinDistance = !entity.isDead() && isWithinDistance(entity);
 
             if (withinDistance && !knownEntities.contains(entity) && !hiddenEntities.contains(entity.getUniqueId())) {
@@ -697,20 +700,20 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     }
 
     /**
+     * Get this player's client settings.
+     * @return The player's client settings.
+     */
+    public ClientSettings getSettings() {
+        return settings;
+    }
+
+    /**
      * Set the client settings for this player.
      * @param settings The new client settings.
      */
     public void setSettings(ClientSettings settings) {
         this.settings = settings;
         metadata.set(MetadataIndex.PLAYER_SKIN_FLAGS, settings.getSkinFlags());
-    }
-
-    /**
-     * Get this player's client settings.
-     * @return The player's client settings.
-     */
-    public ClientSettings getSettings() {
-        return settings;
     }
 
     @Override
@@ -877,7 +880,9 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     public void setGameMode(GameMode mode) {
         boolean changed = getGameMode() != mode;
         super.setGameMode(mode);
-        if (changed) session.send(new StateChangeMessage(3, mode.getValue()));
+        if (changed) {
+            session.send(new StateChangeMessage(3, mode.getValue()));
+        }
 
         setAllowFlight(mode == GameMode.CREATIVE);
     }
@@ -939,7 +944,9 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     @Override
     public void setAllowFlight(boolean flight) {
         canFly = flight;
-        if (!canFly) flying = false;
+        if (!canFly) {
+            flying = false;
+        }
         sendAbilities();
     }
 
@@ -1355,7 +1362,9 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
 
     @Override
     public void playSound(Location location, String sound, float volume, float pitch) {
-        if (location == null || sound == null) return;
+        if (location == null || sound == null) {
+            return;
+        }
         // the loss of precision here is a bit unfortunate but it's what CraftBukkit does
         double x = location.getBlockX() + 0.5;
         double y = location.getBlockY() + 0.5;
@@ -1369,8 +1378,11 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     }
 
     @Override
-    public void showParticle(Location loc, Particle particle, MaterialData material, float offsetX, float offsetY, float offsetZ, float speed, int amount) {
-        if (location == null || particle == null) return;
+    public void showParticle(Location loc, Particle particle, MaterialData material, float offsetX, float offsetY, float offsetZ, float speed,
+                             int amount) {
+        if (location == null || particle == null) {
+            return;
+        }
 
         int id = GlowParticle.getId(particle);
         boolean longDistance = GlowParticle.isLongDistance(particle);
@@ -1475,7 +1487,9 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
 
     @Override
     public void removeAchievement(Achievement achievement) {
-        if (!hasAchievement(achievement)) return;
+        if (!hasAchievement(achievement)) {
+            return;
+        }
 
         stats.setAchievement(achievement, false);
         sendAchievement(achievement, false);
@@ -1601,7 +1615,9 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
 
     @Override
     public boolean setWindowProperty(InventoryView.Property prop, int value) {
-        if (!super.setWindowProperty(prop, value)) return false;
+        if (!super.setWindowProperty(prop, value)) {
+            return false;
+        }
         session.send(new WindowPropertyMessage(invMonitor.getId(), prop.getId(), value));
         return true;
     }
@@ -1672,14 +1688,14 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     }
 
     @Override
-    public void setPlayerWeather(WeatherType type) {
-        playerWeather = type;
-        sendWeather();
+    public WeatherType getPlayerWeather() {
+        return playerWeather;
     }
 
     @Override
-    public WeatherType getPlayerWeather() {
-        return playerWeather;
+    public void setPlayerWeather(WeatherType type) {
+        playerWeather = type;
+        sendWeather();
     }
 
     @Override

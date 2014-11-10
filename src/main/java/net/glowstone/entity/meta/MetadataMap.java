@@ -4,7 +4,12 @@ import com.google.common.collect.ImmutableList;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A map for entity metadata.
@@ -49,7 +54,8 @@ public class MetadataMap {
         }
 
         if (!index.appliesTo(entityClass)) {
-            throw new IllegalArgumentException("Index " + index + " does not apply to " + entityClass.getSimpleName() + ", only " + index.getAppliesTo().getSimpleName());
+            throw new IllegalArgumentException(
+                    "Index " + index + " does not apply to " + entityClass.getSimpleName() + ", only " + index.getAppliesTo().getSimpleName());
         }
 
         Object prev = map.put(index, value);
@@ -142,12 +148,13 @@ public class MetadataMap {
     @Override
     public String toString() {
         return "MetadataMap{" +
-                "map=" + map +
-                ", entityClass=" + entityClass +
-                '}';
+               "map=" + map +
+               ", entityClass=" + entityClass +
+               '}';
     }
 
     public static class Entry implements Comparable<Entry> {
+
         public final MetadataIndex index;
         public final Object value;
 
@@ -163,13 +170,21 @@ public class MetadataMap {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
 
             Entry entry = (Entry) o;
 
-            if (index != entry.index) return false;
-            if (value != null ? !value.equals(entry.value) : entry.value != null) return false;
+            if (index != entry.index) {
+                return false;
+            }
+            if (value != null ? !value.equals(entry.value) : entry.value != null) {
+                return false;
+            }
 
             return true;
         }

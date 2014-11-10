@@ -99,10 +99,10 @@ public final class PlayerProfile {
 
     public String toString() {
         return "PlayerProfile{" +
-                "name='" + name + '\'' +
-                ", uuid=" + uuid +
-                ", " + properties.size() + " properties" +
-                '}';
+               "name='" + name + '\'' +
+               ", uuid=" + uuid +
+               ", " + properties.size() + " properties" +
+               '}';
     }
 
     public CompoundTag toNBT() {
@@ -167,14 +167,24 @@ public final class PlayerProfile {
     }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         PlayerProfile that = (PlayerProfile) o;
 
-        if (!name.equals(that.name)) return false;
-        if (!properties.equals(that.properties)) return false;
-        if (!uuid.equals(that.uuid)) return false;
+        if (!name.equals(that.name)) {
+            return false;
+        }
+        if (!properties.equals(that.properties)) {
+            return false;
+        }
+        if (!uuid.equals(that.uuid)) {
+            return false;
+        }
 
         return true;
     }

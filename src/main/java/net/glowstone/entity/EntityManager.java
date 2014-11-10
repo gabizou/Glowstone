@@ -1,10 +1,19 @@
 package net.glowstone.entity;
 
 import net.glowstone.GlowChunk;
+import net.glowstone.entity.physics.BoundingBox;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A class which manages all of the entities within a world.
@@ -70,7 +79,9 @@ public final class EntityManager implements Iterable<GlowEntity> {
         // intentionally wraps around integer boundaries
         for (int id = lastId + 1; id != startedAt; ++id) {
             // skip special values
-            if (id == -1 || id == 0) continue;
+            if (id == -1 || id == 0) {
+                continue;
+            }
 
             if (!entities.containsKey(id)) {
                 allocate(entity, id);
@@ -120,4 +131,14 @@ public final class EntityManager implements Iterable<GlowEntity> {
         return entities.values().iterator();
     }
 
+    public List<Entity> getEntitiesInside(BoundingBox searchBox, GlowEntity except) {
+        // todo: narrow search based on the box's corners
+        List<Entity> result = new LinkedList<>();
+        for (GlowEntity entity : entities.values()) {
+            if (entity != except && entity.intersects(searchBox)) {
+                result.add(entity);
+            }
+        }
+        return result;
+    }
 }
