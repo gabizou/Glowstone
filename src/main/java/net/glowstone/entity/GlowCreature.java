@@ -64,13 +64,13 @@ public class GlowCreature extends GlowLivingEntity implements Creature {
     }
 
     @Override
-    public LivingEntity getTarget() {
-        return target;
+    public void setTarget(LivingEntity target) {
+        this.target = target;
     }
 
     @Override
-    public void setTarget(LivingEntity target) {
-        this.target = target;
+    public LivingEntity getTarget() {
+        return target;
     }
 
 }

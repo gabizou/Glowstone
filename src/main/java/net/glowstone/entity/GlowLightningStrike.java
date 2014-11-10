@@ -16,13 +16,14 @@ import java.util.List;
 public class GlowLightningStrike extends GlowWeather implements LightningStrike {
 
     /**
-     * How long this lightning strike has to remain in the world.
-     */
-    private final int ticksToLive;
-    /**
      * Whether the lightning strike is just for effect.
      */
     private boolean effect;
+    
+    /**
+     * How long this lightning strike has to remain in the world.
+     */
+    private final int ticksToLive;
 
     public GlowLightningStrike(Location location, boolean effect) {
         super(location);
@@ -60,5 +61,5 @@ public class GlowLightningStrike extends GlowWeather implements LightningStrike 
     public List<Message> createUpdateMessage() {
         return Arrays.asList();
     }
-
+    
 }

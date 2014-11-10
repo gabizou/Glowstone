@@ -47,22 +47,27 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
      * The ender chest inventory of this human.
      */
     private final GlowInventory enderChest = new GlowInventory(this, InventoryType.ENDER_CHEST);
-    /**
-     * Whether this human is sleeping or not.
-     */
-    protected boolean sleeping = false;
-    /**
-     * This human's PermissibleBase for permissions.
-     */
-    protected PermissibleBase permissions;
+
     /**
      * The item the player has on their cursor.
      */
     private ItemStack itemOnCursor;
+
+    /**
+     * Whether this human is sleeping or not.
+     */
+    protected boolean sleeping = false;
+
     /**
      * How long this human has been sleeping.
      */
     private int sleepingTicks = 0;
+
+    /**
+     * This human's PermissibleBase for permissions.
+     */
+    protected PermissibleBase permissions;
+
     /**
      * Whether this human is considered an op.
      */
@@ -96,6 +101,14 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
 
     ////////////////////////////////////////////////////////////////////////////
     // Internals
+
+    @Override
+    public void setUniqueId(UUID uuid) {
+        // silently allow setting the same UUID again
+        if (!profile.getUniqueId().equals(uuid)) {
+            throw new IllegalStateException("UUID of " + this + " is already " + profile.getUniqueId());
+        }
+    }
 
     @Override
     public List<Message> createSpawnMessage() {
@@ -139,25 +152,17 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
         return profile;
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Properties
+
     @Override
     public String getName() {
         return profile.getName();
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Properties
-
     @Override
     public UUID getUniqueId() {
         return profile.getUniqueId();
-    }
-
-    @Override
-    public void setUniqueId(UUID uuid) {
-        // silently allow setting the same UUID again
-        if (!profile.getUniqueId().equals(uuid)) {
-            throw new IllegalStateException("UUID of " + this + " is already " + profile.getUniqueId());
-        }
     }
 
     @Override

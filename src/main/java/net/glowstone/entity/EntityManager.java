@@ -6,14 +6,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class which manages all of the entities within a world.
@@ -79,9 +72,7 @@ public final class EntityManager implements Iterable<GlowEntity> {
         // intentionally wraps around integer boundaries
         for (int id = lastId + 1; id != startedAt; ++id) {
             // skip special values
-            if (id == -1 || id == 0) {
-                continue;
-            }
+            if (id == -1 || id == 0) continue;
 
             if (!entities.containsKey(id)) {
                 allocate(entity, id);

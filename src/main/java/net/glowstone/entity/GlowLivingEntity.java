@@ -19,15 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A GlowLivingEntity is a {@link org.bukkit.entity.Player} or {@link org.bukkit.entity.Monster}.
@@ -378,12 +370,8 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
 
     @Override
     public void setHealth(double health) {
-        if (health < 0) {
-            health = 0;
-        }
-        if (health > maxHealth) {
-            health = maxHealth;
-        }
+        if (health < 0) health = 0;
+        if (health > maxHealth) health = maxHealth;
         this.health = health;
     }
 
@@ -571,9 +559,7 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
 
     @Override
     public void removePotionEffect(PotionEffectType type) {
-        if (!hasPotionEffect(type)) {
-            return;
-        }
+        if (!hasPotionEffect(type)) return;
         potionEffects.remove(type);
 
         // todo: this, improved, for players in range
@@ -592,23 +578,23 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
     // Custom name
 
     @Override
-    public String getCustomName() {
-        return customName;
-    }
-
-    @Override
     public void setCustomName(String name) {
         customName = name;
     }
 
     @Override
-    public boolean isCustomNameVisible() {
-        return customNameVisible;
+    public String getCustomName() {
+        return customName;
     }
 
     @Override
     public void setCustomNameVisible(boolean flag) {
         customNameVisible = flag;
+    }
+
+    @Override
+    public boolean isCustomNameVisible() {
+        return customNameVisible;
     }
 
     ////////////////////////////////////////////////////////////////////////////
