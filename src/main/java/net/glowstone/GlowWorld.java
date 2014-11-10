@@ -1024,20 +1024,15 @@ public final class GlowWorld implements World {
         if (location == null || clazz == null) {
             throw new IllegalArgumentException("Location or entity class cannot be null");
         }
-        // order is important for some of these
         Entity entity = null;
         Class<? extends GlowEntity> entityClass = ENTITY_REGISTRY.get(clazz);
         try {
             entity = entityClass.getConstructor(Location.class).newInstance(location);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Cannot spawn an entity for " + clazz.getName(), e);
         }
 
-        if (entity != null) {
-            return (T) entity;
-        }
-
-        throw new IllegalArgumentException("Cannot spawn an entity for " + clazz.getName());
+        return (T) entity;
     }
 
     @Override
