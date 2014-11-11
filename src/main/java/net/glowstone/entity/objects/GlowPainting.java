@@ -1,7 +1,9 @@
 package net.glowstone.entity.objects;
 
+import com.artemis.ComponentMapper;
 import com.flowpowered.networking.Message;
 import net.glowstone.entity.GlowHanging;
+import net.glowstone.entity.components.PaintingComponent;
 import net.glowstone.net.message.play.entity.EntityMetadataMessage;
 import net.glowstone.net.message.play.entity.SpawnPaintingMessage;
 import net.glowstone.util.CapitalizeEnum;
@@ -22,15 +24,19 @@ import java.util.List;
 
 public class GlowPainting extends GlowHanging implements Painting {
 
-    Art motive;
-
     public GlowPainting(Location location) {
         this(location, Art.BURNINGSKULL);
     }
 
     public GlowPainting(Location location, Art art) {
         super(location, EntityType.PAINTING);
-        this.motive = art;
+
+        getArtemisEntity().edit()
+                .add(new PaintingComponent(art));
+    }
+
+    protected PaintingComponent getPaintingComponent() {
+        return ComponentMapper.getFor(PaintingComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
     }
 
     public static boolean fitsOnWall(World world, Location location, BlockFace facingDirection, Art motive) {
@@ -152,8 +158,8 @@ public class GlowPainting extends GlowHanging implements Painting {
         int x = getTileX();
         int y = getTileY();
         int z = getTileZ();
-        return Arrays.asList(new SpawnPaintingMessage(id, artToString(motive), x, y, z, getFacingInt(facingDirection)),
-                             new EntityMetadataMessage(id, metadata.getEntryList()));
+        return Arrays.asList(new SpawnPaintingMessage(id, artToString(getArt()), x, y, z, getFacingInt(facingDirection)),
+                             new EntityMetadataMessage(id, getMetadataComponent().getMetadata().getEntryList()));
     }
 
     @Override
@@ -164,7 +170,7 @@ public class GlowPainting extends GlowHanging implements Painting {
 
     @Override
     public Art getArt() {
-        return motive;
+        return getPaintingComponent().getMotive();
     }
 
     @Override
@@ -174,8 +180,8 @@ public class GlowPainting extends GlowHanging implements Painting {
 
     @Override
     public boolean setArt(Art motive, boolean force) {
-        this.motive = motive;
-        if (!force && !fitsOnWall(getWorld(), location, facingDirection, motive)) {
+        getPaintingComponent().setMotive(motive);
+        if (!force && !fitsOnWall(getWorld(), getLocation(), facingDirection, motive)) {
             remove();
             return false;
         } else {
@@ -184,27 +190,27 @@ public class GlowPainting extends GlowHanging implements Painting {
     }
 
     public int getTileX() {
-        return (int) location.getX();
+        return (int) getLocation().getX();
     }
 
     public void setTileX(int tileX) {
-        location.setX(tileX);
+        getLocation().setX(tileX);
     }
 
     public int getTileY() {
-        return (int) location.getY();
+        return (int) getLocation().getY();
     }
 
     public void setTileY(int tileY) {
-        location.setY(tileY);
+        getLocation().setY(tileY);
     }
 
     public int getTileZ() {
-        return (int) location.getZ();
+        return (int) getLocation().getZ();
     }
 
     public void setTileZ(int tileZ) {
-        location.setZ(tileZ);
+        getLocation().setZ(tileZ);
     }
 
     public void setTilePosition(int tileX, int tileY, int tileZ) {
@@ -230,13 +236,13 @@ public class GlowPainting extends GlowHanging implements Painting {
 
     @Override
     public void setVelocity(Vector velocity) {
-        return;
+
     }
 
     @Override
     public boolean setFacingDirection(BlockFace blockFace, boolean force) {
         if (super.setFacingDirection(blockFace, force)) {
-            if (!force && !fitsOnWall(getWorld(), location, facingDirection, motive)) {
+            if (!force && !fitsOnWall(getWorld(), getLocation(), facingDirection, getArt())) {
                 remove();
                 return false;
             } else {
@@ -246,19 +252,11 @@ public class GlowPainting extends GlowHanging implements Painting {
         return false;
     }
 
-    @Override
-    public void pulse() {
-        super.pulse();
-        if (!fitsOnWall(getWorld(), location, facingDirection, motive)) {
-            remove();
-        }
-    }
-
 
 
     @Override
     public void remove() {
         super.remove();
-        world.dropItem(location, new ItemStack(Material.PAINTING));
+        world.dropItem(getLocation(), new ItemStack(Material.PAINTING));
     }
 }

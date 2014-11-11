@@ -1,6 +1,8 @@
 package net.glowstone.entity;
 
+import com.artemis.ComponentMapper;
 import com.flowpowered.networking.Message;
+import net.glowstone.entity.components.AgeComponent;
 import net.glowstone.entity.meta.MetadataIndex;
 import net.glowstone.entity.meta.MetadataMap;
 import net.glowstone.net.message.play.entity.EntityMetadataMessage;
@@ -15,12 +17,7 @@ import java.util.List;
  */
 public class GlowAgeable extends GlowCreature implements Ageable {
 
-    private static final int AGE_BABY = -24000;
-    private static final int AGE_ADULT = 0;
-    private static final int BREEDING_AGE = 6000;
     protected float width, height;
-    private int age = 0;
-    private boolean ageLocked = false;
 
     /**
      * Creates a new ageable monster.
@@ -29,76 +26,67 @@ public class GlowAgeable extends GlowCreature implements Ageable {
      */
     public GlowAgeable(Location location, EntityType type) {
         super(location, type);
+        getArtemisEntity().edit()
+                .add(new AgeComponent());
     }
 
-    @Override
-    public void pulse() {
-        super.pulse();
-        if (this.ageLocked) {
-            setScaleForAge(!isAdult());
-        } else {
-            int currentAge = this.age;
-            if (currentAge < AGE_ADULT) {
-                currentAge++;
-                setAge(currentAge);
-            } else if (currentAge > AGE_ADULT) {
-                currentAge--;
-                setAge(currentAge);
-            }
-        }
-    }
+    ////////////////////////////////////////////////////////////////////////////
+    // Artemis getters and setters.
 
-    @Override
-    public final int getAge() {
-        return this.age;
+    protected AgeComponent getAgeComponent() {
+        return ComponentMapper.getFor(AgeComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
     }
 
     @Override
     public final void setAge(int age) {
-        this.age = age;
+        getAgeComponent().setAge(age);
         this.setScaleForAge(isAdult());
+    }
+
+    public final int getAge() {
+        return getAgeComponent().getAge();
     }
 
     @Override
     public final boolean getAgeLock() {
-        return this.ageLocked;
+        return this.getAgeComponent().isAgeLocked();
     }
 
     @Override
     public final void setAgeLock(boolean ageLocked) {
-        this.ageLocked = ageLocked;
+        this.getAgeComponent().setAgeLocked(ageLocked);
     }
 
     @Override
     public final void setBaby() {
         if (isAdult()) {
-            setAge(AGE_BABY);
+            setAge(AgeComponent.AGE_BABY);
         }
     }
 
     @Override
     public final void setAdult() {
         if (!isAdult()) {
-            setAge(AGE_ADULT);
+            setAge(AgeComponent.AGE_ADULT);
         }
     }
 
     @Override
     public final boolean isAdult() {
-        return this.age >= AGE_ADULT;
+        return getAge() >= AgeComponent.AGE_ADULT;
     }
 
     @Override
     public final boolean canBreed() {
-        return this.age == AGE_ADULT;
+        return getAge() == AgeComponent.AGE_ADULT;
     }
 
     @Override
     public void setBreed(boolean breed) {
         if (breed) {
-            setAge(AGE_ADULT);
+            setAge(AgeComponent.AGE_ADULT);
         } else if (isAdult()) {
-            setAge(BREEDING_AGE);
+            setAge(AgeComponent.BREEDING_AGE);
         }
     }
 
@@ -109,7 +97,7 @@ public class GlowAgeable extends GlowCreature implements Ageable {
     @Override
     public List<Message> createSpawnMessage() {
         List<Message> messages = super.createSpawnMessage();
-        MetadataMap map = new MetadataMap(GlowAgeable.class);
+        MetadataMap map = getMetadataComponent().getMetadata();
         map.set(MetadataIndex.AGE, this.getAge());
         messages.add(new EntityMetadataMessage(id, map.getEntryList()));
         return messages;

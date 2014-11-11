@@ -1,7 +1,10 @@
 package net.glowstone.entity.objects;
 
+import com.artemis.ComponentMapper;
 import com.flowpowered.networking.Message;
 import net.glowstone.entity.GlowEntity;
+import net.glowstone.entity.components.ExpirableLifeComponent;
+import net.glowstone.entity.components.PickupDelayComponent;
 import net.glowstone.entity.meta.MetadataIndex;
 import net.glowstone.net.message.play.entity.EntityMetadataMessage;
 import net.glowstone.net.message.play.entity.EntityTeleportMessage;
@@ -29,11 +32,6 @@ public final class GlowItem extends GlowEntity implements Item {
     private static final int LIFETIME = 5 * 60 * 20;
 
     /**
-     * The remaining delay until this item may be picked up.
-     */
-    private int pickupDelay;
-
-    /**
      * Creates a new item entity.
      * @param location The location of the entity.
      * @param item The item stack the entity is carrying.
@@ -42,7 +40,17 @@ public final class GlowItem extends GlowEntity implements Item {
         super(location);
         setItemStack(item);
         setBoundingBox(0.25, 0.25);
-        pickupDelay = 20;
+        getArtemisEntity().edit()
+                .add(new ExpirableLifeComponent(LIFETIME))
+                .add(new PickupDelayComponent(20));
+    }
+
+    protected ExpirableLifeComponent getExpirableLifeComponent() {
+        return ComponentMapper.getFor(ExpirableLifeComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
+    }
+
+    protected PickupDelayComponent getPickupDelayComponent() {
+        return ComponentMapper.getFor(PickupDelayComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -54,22 +62,8 @@ public final class GlowItem extends GlowEntity implements Item {
     }
 
     @Override
-    public void pulse() {
-        super.pulse();
-
-        // decrement pickupDelay if it's less than the NBT maximum
-        if (pickupDelay > 0) {
-            --pickupDelay;
-        }
-
-        // disappear if we've lived too long
-        if (getTicksLived() >= LIFETIME) {
-            // todo: remove();
-        }
-    }
-
-    @Override
     public List<Message> createSpawnMessage() {
+        Location location = getLocation();
         int x = Position.getIntX(location);
         int y = Position.getIntY(location);
         int z = Position.getIntZ(location);
@@ -79,7 +73,7 @@ public final class GlowItem extends GlowEntity implements Item {
 
         return Arrays.asList(
                 new SpawnObjectMessage(id, SpawnObjectMessage.ITEM, x, y, z, pitch, yaw),
-                new EntityMetadataMessage(id, metadata.getEntryList()),
+                new EntityMetadataMessage(id, getMetadataComponent().getMetadata().getEntryList()),
                 // these keep the client from assigning a random velocity
                 new EntityTeleportMessage(id, x, y, z, yaw, pitch),
                 new EntityVelocityMessage(id, getVelocity())
@@ -91,23 +85,23 @@ public final class GlowItem extends GlowEntity implements Item {
 
     @Override
     public int getPickupDelay() {
-        return pickupDelay;
+        return getPickupDelayComponent().getPickupDelay();
     }
 
     @Override
     public void setPickupDelay(int delay) {
-        pickupDelay = delay;
+        getPickupDelayComponent().setPickupDelay(delay);
     }
 
     @Override
     public ItemStack getItemStack() {
-        return metadata.getItem(MetadataIndex.ITEM_ITEM);
+        return getMetadataComponent().getMetadata().getItem(MetadataIndex.ITEM_ITEM);
     }
 
     @Override
     public void setItemStack(ItemStack stack) {
         // stone is the "default state" for the item stack according to the client
-        metadata.set(MetadataIndex.ITEM_ITEM, stack == null ? new ItemStack(Material.STONE) : stack.clone());
+        getMetadataComponent().getMetadata().set(MetadataIndex.ITEM_ITEM, stack == null ? new ItemStack(Material.STONE) : stack.clone());
     }
 
 }

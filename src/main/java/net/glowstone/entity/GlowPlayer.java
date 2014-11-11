@@ -3,12 +3,13 @@ package net.glowstone.entity;
 import com.flowpowered.networking.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Getter;
 import net.glowstone.*;
 import net.glowstone.block.entity.TileEntity;
 import net.glowstone.constants.*;
+import net.glowstone.entity.components.PlayerComponent;
 import net.glowstone.entity.meta.ClientSettings;
 import net.glowstone.entity.meta.MetadataIndex;
-import net.glowstone.entity.meta.MetadataMap;
 import net.glowstone.entity.meta.profile.PlayerProfile;
 import net.glowstone.inventory.GlowInventory;
 import net.glowstone.inventory.InventoryMonitor;
@@ -16,7 +17,6 @@ import net.glowstone.io.PlayerDataService;
 import net.glowstone.net.GlowSession;
 import net.glowstone.net.message.login.LoginSuccessMessage;
 import net.glowstone.net.message.play.entity.DestroyEntitiesMessage;
-import net.glowstone.net.message.play.entity.EntityMetadataMessage;
 import net.glowstone.net.message.play.entity.EntityVelocityMessage;
 import net.glowstone.net.message.play.game.*;
 import net.glowstone.net.message.play.inv.*;
@@ -62,7 +62,7 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     /**
      * A static entity id to use when telling the client about itself.
      */
-    private static final int SELF_ID = 0;
+    public static final int SELF_ID = 0;
 
     /**
      * This player's session.
@@ -72,11 +72,13 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     /**
      * The entities that the client knows about.
      */
+    @Getter
     private final Set<GlowEntity> knownEntities = new HashSet<>();
 
     /**
      * The entities that are hidden from the client.
      */
+    @Getter
     private final Set<UUID> hiddenEntities = new HashSet<>();
 
     /**
@@ -138,6 +140,7 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     /**
      * The tracker for changes to the currently open inventory.
      */
+    @Getter
     private InventoryMonitor invMonitor;
 
     /**
@@ -311,7 +314,10 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
         updateInventory(); // send inventory contents
 
         // send initial location
-        session.send(new PositionRotationMessage(location));
+        session.send(new PositionRotationMessage(getLocation()));
+
+        getArtemisEntity().edit()
+                .add(new PlayerComponent());
 
         if (!server.getResourcePackURL().isEmpty()) {
             setResourcePack(server.getResourcePackURL(), server.getResourcePackHash());
@@ -379,61 +385,12 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
         return false;
     }
 
-    @Override
-    public void pulse() {
-        super.pulse();
-
-        // stream world
-        streamBlocks();
-        processBlockChanges();
-
-        // add to playtime
-        incrementStatistic(Statistic.PLAY_ONE_TICK);
-
-        // update inventory
-        for (InventoryMonitor.Entry entry : invMonitor.getChanges()) {
-            sendItemChange(entry.slot, entry.item);
-        }
-
-        // send changed metadata
-        List<MetadataMap.Entry> changes = metadata.getChanges();
-        if (changes.size() > 0) {
-            session.send(new EntityMetadataMessage(SELF_ID, changes));
-        }
-
-        // update or remove entities
-        List<Integer> destroyIds = new LinkedList<>();
-        for (Iterator<GlowEntity> it = knownEntities.iterator(); it.hasNext(); ) {
-            GlowEntity entity = it.next();
-            if (isWithinDistance(entity)) {
-                for (Message msg : entity.createUpdateMessage()) {
-                    session.send(msg);
-                }
-            } else {
-                destroyIds.add(entity.getEntityId());
-                it.remove();
-            }
-        }
-        if (destroyIds.size() > 0) {
-            session.send(new DestroyEntitiesMessage(destroyIds));
-        }
-
-        // add entities
-        for (GlowEntity entity : world.getEntityManager()) {
-            if (entity != this && isWithinDistance(entity) &&
-                    !knownEntities.contains(entity) && !hiddenEntities.contains(entity.getUniqueId())) {
-                knownEntities.add(entity);
-                for (Message msg : entity.createSpawnMessage()) {
-                    session.send(msg);
-                }
-            }
-        }
-    }
 
     /**
      * Process and send pending BlockChangeMessages.
      */
-    private void processBlockChanges() {
+    //TODO greatman : Maybe unpublic this?
+    public void processBlockChanges() {
         List<BlockChangeMessage> messages = new ArrayList<>(blockChanges);
         blockChanges.clear();
 
@@ -473,9 +430,11 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
     /**
      * Streams chunks to the player's client.
      */
-    private void streamBlocks() {
+    //TODO greatman : Maybe unpublic this?
+    public void streamBlocks() {
         Set<GlowChunk.Key> previousChunks = new HashSet<>(knownChunks);
         ArrayList<GlowChunk.Key> newChunks = new ArrayList<>();
+        final Location location = getLocation();
 
         int centralX = location.getBlockX() >> 4;
         int centralZ = location.getBlockZ() >> 4;
@@ -700,22 +659,24 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
             session.send(new EntityVelocityMessage(SELF_ID, velocity));
         }
     }
-
-    /**
-     * Set the client settings for this player.
-     * @param settings The new client settings.
-     */
-    public void setSettings(ClientSettings settings) {
-        this.settings = settings;
-        metadata.set(MetadataIndex.PLAYER_SKIN_FLAGS, settings.getSkinFlags());
-    }
-
+    
     /**
      * Get this player's client settings.
+     *
      * @return The player's client settings.
      */
     public ClientSettings getSettings() {
         return settings;
+    }
+
+    /**
+     * Set the client settings for this player.
+     * 
+     * @param settings The new client settings.
+     */
+    public void setSettings(ClientSettings settings) {
+        this.settings = settings;
+        getMetadataComponent().getMetadata().set(MetadataIndex.PLAYER_SKIN_FLAGS, settings.getSkinFlags());
     }
 
     @Override
@@ -894,7 +855,7 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
 
     @Override
     public boolean isSneaking() {
-        return metadata.getBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SNEAKING);
+        return getMetadataComponent().getMetadata().getBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SNEAKING);
     }
 
     @Override
@@ -903,12 +864,12 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
             return;
         }
 
-        metadata.setBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SNEAKING, sneak);
+        getMetadataComponent().getMetadata().setBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SNEAKING, sneak);
     }
 
     @Override
     public boolean isSprinting() {
-        return metadata.getBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SPRINTING);
+        return getMetadataComponent().getMetadata().getBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SPRINTING);
     }
 
     @Override
@@ -917,7 +878,7 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
             return;
         }
 
-        metadata.setBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SPRINTING, sprinting);
+        getMetadataComponent().getMetadata().setBit(MetadataIndex.STATUS, MetadataIndex.StatusFlags.SPRINTING, sprinting);
     }
 
     @Override
@@ -1150,8 +1111,9 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
 
     @Override
     public boolean teleport(Location location, TeleportCause cause) {
-        if (this.location != null && this.location.getWorld() != null) {
-            PlayerTeleportEvent event = new PlayerTeleportEvent(this, this.location, location, cause);
+        Location currentLocation = getLocation();
+        if (currentLocation != null && currentLocation.getWorld() != null) {
+            PlayerTeleportEvent event = new PlayerTeleportEvent(this, currentLocation, location, cause);
             if (EventFactory.callEvent(event).isCancelled()) {
                 return false;
             }
@@ -1165,32 +1127,32 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
             setRawLocation(location);
         }
 
-        teleported = true;
+        getLocationComponent().setTeleported(true);
         return true;
     }
 
     @Override
-    protected boolean teleportToSpawn() {
+    public boolean teleportToSpawn() {
         Location target = getBedSpawnLocation();
         if (target == null) {
             target = server.getWorlds().get(0).getSpawnLocation();
         }
 
-        PlayerPortalEvent event = EventFactory.callEvent(new PlayerPortalEvent(this, location.clone(), target, null));
+        PlayerPortalEvent event = EventFactory.callEvent(new PlayerPortalEvent(this, getLocationComponent().getLocation().clone(), target, null));
         if (event.isCancelled()) {
             return false;
         }
         target = event.getTo();
 
         spawnAt(target);
-        teleported = true;
+        getLocationComponent().setTeleported(true);
 
         awardAchievement(Achievement.THE_END, false);
         return true;
     }
 
     @Override
-    protected boolean teleportToEnd() {
+    public boolean teleportToEnd() {
         if (!server.getAllowEnd()) {
             return false;
         }
@@ -1205,14 +1167,14 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
             return false;
         }
 
-        PlayerPortalEvent event = EventFactory.callEvent(new PlayerPortalEvent(this, location.clone(), target, null));
+        PlayerPortalEvent event = EventFactory.callEvent(new PlayerPortalEvent(this, getLocationComponent().getLocation().clone(), target, null));
         if (event.isCancelled()) {
             return false;
         }
         target = event.getTo();
 
         spawnAt(target);
-        teleported = true;
+        getLocationComponent().setTeleported(true);
 
         awardAchievement(Achievement.END_PORTAL, false);
         return true;
@@ -1381,7 +1343,7 @@ public final class GlowPlayer extends GlowHumanEntity implements Player {
 
     @Override
     public void showParticle(Location loc, Particle particle, MaterialData material, float offsetX, float offsetY, float offsetZ, float speed, int amount) {
-        if (location == null || particle == null) return;
+        if (loc == null || particle == null) return;
 
         int id = GlowParticle.getId(particle);
         boolean longDistance = GlowParticle.isLongDistance(particle);

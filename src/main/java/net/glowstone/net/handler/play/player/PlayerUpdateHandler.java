@@ -23,6 +23,10 @@ public final class PlayerUpdateHandler implements MessageHandler<GlowSession, Pl
         if (newLocation.distanceSquared(oldLocation) > 16 * 16) {
             return;
         }
+        session.getPlayer().setOnGround(message.isOnGround());
+        if (!message.isOnGround()) {
+            session.getPlayer().setFallDistance((float) (oldLocation.getY() - newLocation.getY()));
+        }
 
         // call move event if movement actually occurred and there are handlers registered
         if (!oldLocation.equals(newLocation) && PlayerMoveEvent.getHandlerList().getRegisteredListeners().length > 0) {

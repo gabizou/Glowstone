@@ -1,55 +1,57 @@
 package net.glowstone.entity.passive;
 
+import com.artemis.ComponentMapper;
 import net.glowstone.entity.GlowAnimal;
+import net.glowstone.entity.components.TameableComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 
 import java.util.UUID;
 
 public abstract class GlowTameable extends GlowAnimal implements Tameable {
 
-    private AnimalTamer owner;
-    private UUID ownerUUId;
-    private boolean tamed;
-
     public GlowTameable(Location location, EntityType type) {
-        super(location, type);
-        setSize(0.3F, 0.7F);
+        this(location, type, null);
     }
 
     protected GlowTameable(Location location, EntityType type, AnimalTamer owner) {
         super(location, type);
-        this.owner = owner;
+        getArtemisEntity().edit()
+                .add(new TameableComponent(owner != null ? owner.getUniqueId() : null, false, false));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Artemis getters and setters.
+    protected TameableComponent getTameableComponent() {
+        return ComponentMapper.getFor(TameableComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
     }
 
     @Override
     public boolean isTamed() {
-        return tamed;
+        return getTameableComponent().isTamed();
     }
 
     @Override
     public void setTamed(boolean isTamed) {
-        this.tamed = isTamed;
+        getTameableComponent().setTamed(isTamed);
     }
 
     @Override
     public AnimalTamer getOwner() {
-        return owner instanceof Player ? owner : Bukkit.getPlayer(this.ownerUUId);
+        return Bukkit.getPlayer(this.getTameableComponent().getOwnerUniqueId());
     }
 
     @Override
     public void setOwner(AnimalTamer animalTamer) {
-        this.owner = animalTamer;
-        this.ownerUUId = animalTamer.getUniqueId();
+        getTameableComponent().setOwnerUniqueId(animalTamer.getUniqueId());
     }
 
     public UUID getOwnerUUID() {
-        return this.ownerUUId;
+        return this.getTameableComponent().getOwnerUniqueId();
     }
 
     /**
@@ -58,12 +60,13 @@ public abstract class GlowTameable extends GlowAnimal implements Tameable {
      * with the specified UUID has not played on the server before, the
      * owner is not set.
      *
-     * @param ownerUUID
+     * @param ownerUUID The UUID of the owner.
      */
     public void setOwnerUUID(UUID ownerUUID) {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(ownerUUId);
+        TameableComponent component = getTameableComponent();
+        OfflinePlayer player = Bukkit.getOfflinePlayer(ownerUUID);
         if (player.hasPlayedBefore()) {
-            this.ownerUUId = ownerUUID;
+            component.setOwnerUniqueId(ownerUUID);
         }
     }
 }

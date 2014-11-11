@@ -5,20 +5,24 @@ import net.glowstone.constants.GlowBiome;
 import net.glowstone.constants.GlowEffect;
 import net.glowstone.constants.GlowParticle;
 import net.glowstone.entity.*;
+import net.glowstone.entity.EntityManager;
 import net.glowstone.entity.monsters.*;
 import net.glowstone.entity.passive.*;
 import net.glowstone.entity.objects.*;
 import net.glowstone.entity.projectiles.*;
+import net.glowstone.entity.systems.*;
 import net.glowstone.generator.TreeGenerator;
 import net.glowstone.io.WorldMetadataService.WorldFinalValues;
 import net.glowstone.io.WorldStorageProvider;
 import net.glowstone.io.anvil.AnvilWorldStorageProvider;
 import net.glowstone.util.BlockStateDelegate;
 import org.bukkit.*;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
@@ -232,6 +236,9 @@ public final class GlowWorld implements World {
      */
     private int monsterLimit, animalLimit, waterAnimalLimit, ambientLimit;
 
+
+    private final com.artemis.World artemisWorld;
+
     static {
         registerEntity(Blaze.class, GlowBlaze.class);
         registerEntity(CaveSpider.class, GlowCaveSpider.class);
@@ -312,6 +319,25 @@ public final class GlowWorld implements World {
         ambientLimit = server.getAmbientSpawnLimit();
         keepSpawnLoaded = server.keepSpawnLoaded();
         difficulty = server.getDifficulty();
+        artemisWorld = new com.artemis.World();
+        artemisWorld.setSystem(new LifeSystem());
+        artemisWorld.setSystem(new FireSystem());
+        artemisWorld.setSystem(new AgeSystem());
+        artemisWorld.setSystem(new AngerSystem());
+        artemisWorld.setSystem(new ExpireableLifetimeSystem());
+        artemisWorld.setSystem(new FallSystem());
+        artemisWorld.setSystem(new EntitySystem());
+        artemisWorld.setSystem(new PlayerSystem());
+        artemisWorld.setSystem(new InvincibilitySystem());
+        artemisWorld.setSystem(new BreathingSystem());
+        artemisWorld.setSystem(new GravitySystem());
+        artemisWorld.setSystem(new PotionEffectSystem());
+        artemisWorld.setSystem(new SleepSystem());
+        artemisWorld.setSystem(new PickupDelaySystem());
+        artemisWorld.setSystem(new PaintingSystem());
+        //MUST BE LAST
+        artemisWorld.setSystem(new ResetSystem());
+        artemisWorld.initialize();
 
         // read in world data
         WorldFinalValues values = null;
@@ -395,6 +421,11 @@ public final class GlowWorld implements World {
     ////////////////////////////////////////////////////////////////////////////
     // Various internal mechanisms
 
+
+    public com.artemis.World getArtemisWorld() {
+        return artemisWorld;
+    }
+
     /**
      * Get the world chunk manager.
      * @return The ChunkManager for the world.
@@ -429,7 +460,10 @@ public final class GlowWorld implements World {
         // pulse players last so they actually see that other entities have
         // moved. unfortunately pretty hacky. not a problem for players b/c
         // their position is modified by session ticking.
-        for (GlowEntity entity : temp) {
+        artemisWorld.setDelta(1);
+        artemisWorld.process();
+        //TODO greatman - Ticks with artemis instead (done)
+        /*for (GlowEntity entity : temp) {
             if (entity instanceof GlowPlayer) {
                 players.add(entity);
             } else {
@@ -442,11 +476,11 @@ public final class GlowWorld implements World {
 
         for (GlowEntity entity : temp) {
             entity.reset();
-        }
+        }*/
 
         // Tick the world age and time of day
         // Modulus by 24000, the tick length of a day
-        worldAge++;
+        this.worldAge++;
         time = (time + 1) % DAY_LENGTH;
         if (worldAge % (30 * 20) == 0) {
             // Only send the time every so often; clients are smart.
@@ -1108,7 +1142,7 @@ public final class GlowWorld implements World {
     }
 
     private GlowLightningStrike strikeLightningFireEvent(final Location loc, final boolean effect) {
-        final GlowLightningStrike strike = new GlowLightningStrike(loc, effect, random);
+        final GlowLightningStrike strike = new GlowLightningStrike(loc, effect);
         final LightningStrikeEvent event = new LightningStrikeEvent(this, strike);
         if (EventFactory.callEvent(event).isCancelled()) {
             return null;

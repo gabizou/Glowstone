@@ -1,13 +1,13 @@
 package net.glowstone.entity;
 
+import com.artemis.ComponentMapper;
 import com.flowpowered.networking.Message;
 import net.glowstone.EventFactory;
-import net.glowstone.constants.GlowPotionEffect;
+import net.glowstone.entity.components.*;
 import net.glowstone.inventory.EquipmentMonitor;
 import net.glowstone.net.message.play.entity.EntityEquipmentMessage;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -29,54 +29,9 @@ import java.util.*;
 public abstract class GlowLivingEntity extends GlowEntity implements LivingEntity {
 
     /**
-     * Potion effects on the entity.
-     */
-    private final Map<PotionEffectType, PotionEffect> potionEffects = new HashMap<>();
-
-    /**
-     * The entity's health.
-     */
-    protected double health;
-
-    /**
-     * The entity's maximum health.
-     */
-    protected double maxHealth;
-
-    /**
      * The magnitude of the last damage the entity took.
      */
     private double lastDamage;
-
-    /**
-     * How long the entity has until it runs out of air.
-     */
-    private int airTicks = 300;
-
-    /**
-     * The maximum amount of air the entity can hold.
-     */
-    private int maximumAir = 300;
-
-    /**
-     * The number of ticks remaining in the invincibility period.
-     */
-    private int noDamageTicks = 0;
-
-    /**
-     * The default length of the invincibility period.
-     */
-    private int maxNoDamageTicks = 20;
-
-    /**
-     * A custom overhead name to be shown for non-Players.
-     */
-    private String customName;
-
-    /**
-     * Whether the custom name is shown.
-     */
-    private boolean customNameVisible;
 
     /**
      * Whether the entity should be removed if it is too distant from players.
@@ -100,52 +55,50 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
      */
     public GlowLivingEntity(Location location) {
         super(location);
+        getArtemisEntity().edit()
+                .add(new HealthComponent())
+                .add(new AirComponent())
+                .add(new NameComponent())
+                .add(new InvincibilityComponent())
+                .add(new PotionEffectsComponent());
         resetMaxHealth();
-        health = maxHealth;
+        HealthComponent health = getHealthComponent();
+        health.setHealth(health.getMaxHealth());
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Artemis getters and setters.
+
+    protected HealthComponent getHealthComponent() {
+        return ComponentMapper.getFor(HealthComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
+    }
+
+    protected NameComponent getNameComponent() {
+        return ComponentMapper.getFor(NameComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
+    }
+
+    protected InvincibilityComponent getInvincibilityComponent() {
+        return ComponentMapper.getFor(InvincibilityComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
+    }
+
+    protected AirComponent getAirComponent() {
+        return ComponentMapper.getFor(AirComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
+    }
+
+    protected PotionEffectsComponent getPotionEffectsComponent() {
+        return ComponentMapper.getFor(PotionEffectsComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
+    }
+
+    public int getInvincibilityTicks() {
+        return getInvincibilityComponent().getInvincibilityTicks();
+    }
+
+    public void setInvincibilityTicks(int ticks) {
+        getInvincibilityComponent().setInvincibilityTicks(ticks);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // Internals
-
-    @Override
-    public void pulse() {
-        super.pulse();
-
-        // invulnerability
-        if (noDamageTicks > 0) {
-            --noDamageTicks;
-        }
-
-        Material mat = getEyeLocation().getBlock().getType();
-        // breathing
-        if (mat == Material.WATER || mat == Material.STATIONARY_WATER) {
-            if (canDrown()) {
-                --airTicks;
-                if (airTicks <= -20) {
-                    airTicks = 0;
-                    damage(1, EntityDamageEvent.DamageCause.DROWNING);
-                }
-            }
-        } else {
-            airTicks = maximumAir;
-        }
-
-        // potion effects
-        List<PotionEffect> effects = new ArrayList<>(potionEffects.values());
-        for (PotionEffect effect : effects) {
-            // pulse effect
-            GlowPotionEffect type = (GlowPotionEffect) effect.getType();
-            type.pulse(this, effect);
-
-            if (effect.getDuration() > 0) {
-                // reduce duration and re-add
-                addPotionEffect(new PotionEffect(type, effect.getDuration() - 1, effect.getAmplifier(), effect.isAmbient()), true);
-            } else {
-                // remove
-                removePotionEffect(type);
-            }
-        }
-    }
 
     @Override
     public void reset() {
@@ -200,44 +153,50 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
     ////////////////////////////////////////////////////////////////////////////
     // Properties
 
+
+    @Override
+    public double getHealth() {
+        return getHealthComponent().getHealth();
+    }
+
     @Override
     public int getNoDamageTicks() {
-        return noDamageTicks;
+        return getInvincibilityComponent().getInvincibilityTicks();
     }
 
     @Override
     public void setNoDamageTicks(int ticks) {
-        noDamageTicks = ticks;
+        getInvincibilityComponent().setInvincibilityTicks(ticks);
     }
 
     @Override
     public int getMaximumNoDamageTicks() {
-        return maxNoDamageTicks;
+        return getInvincibilityComponent().getMaxInvincibilityTicks();
     }
 
     @Override
     public void setMaximumNoDamageTicks(int ticks) {
-        maxNoDamageTicks = ticks;
+        getInvincibilityComponent().setMaxInvincibilityTicks(ticks);
     }
 
     @Override
     public int getRemainingAir() {
-        return airTicks;
+        return getAirComponent().getAir();
     }
 
     @Override
     public void setRemainingAir(int ticks) {
-        airTicks = Math.min(ticks, maximumAir);
+        getAirComponent().setAir(Math.min(ticks, getMaximumAir()));
     }
 
     @Override
     public int getMaximumAir() {
-        return maximumAir;
+        return getAirComponent().getMaxAir();
     }
 
     @Override
     public void setMaximumAir(int ticks) {
-        maximumAir = Math.max(0, ticks);
+        getAirComponent().setMaxAir(Math.max(0, ticks));
     }
 
     @Override
@@ -280,7 +239,7 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
      * Get whether this entity should take drowning damage.
      * @return whether this entity can drown
      */
-    protected boolean canDrown() {
+    public boolean canDrown() {
         return true;
     }
 
@@ -364,15 +323,8 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
     // Health
 
     @Override
-    public double getHealth() {
-        return health;
-    }
-
-    @Override
     public void setHealth(double health) {
-        if (health < 0) health = 0;
-        if (health > maxHealth) health = maxHealth;
-        this.health = health;
+        getHealthComponent().setHealth(health);
     }
 
     @Override
@@ -393,7 +345,7 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
     @Override
     public void damage(double amount, Entity source, EntityDamageEvent.DamageCause cause) {
         // invincibility timer
-        if (noDamageTicks > 0 || health <= 0) {
+        if (getInvincibilityComponent().getInvincibilityTicks() > 0 || getHealthComponent().getHealth() <= 0) {
             return;
         }
 
@@ -427,11 +379,12 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
         // apply damage
         amount = event.getFinalDamage();
         lastDamage = amount;
-        setHealth(health - amount);
+        setHealth(getHealth() - amount);
         playEffect(EntityEffect.HURT);
 
+        Location location = getLocation();
         // play sounds, handle death
-        if (health <= 0.0) {
+        if (getHealth() <= 0.0) {
             Sound deathSound = getDeathSound();
             if (deathSound != null) {
                 world.playSound(location, deathSound, 1.0f, 1.0f);
@@ -447,17 +400,17 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
 
     @Override
     public double getMaxHealth() {
-        return maxHealth;
+        return getHealthComponent().getMaxHealth();
     }
 
     @Override
     public void setMaxHealth(double health) {
-        maxHealth = health;
+        getHealthComponent().setMaxHealth(health);
     }
 
     @Override
     public void resetMaxHealth() {
-        maxHealth = 20;
+        getHealthComponent().setMaxHealth(HealthComponent.DEFAULT_MAX_HEALTH);
     }
 
     @Override
@@ -523,7 +476,7 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
 
     @Override
     public boolean addPotionEffect(PotionEffect effect, boolean force) {
-        if (potionEffects.containsKey(effect.getType())) {
+        if (getPotionEffectsComponent().getPotionEffects().containsKey(effect.getType())) {
             if (force) {
                 removePotionEffect(effect.getType());
             } else {
@@ -531,7 +484,7 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
             }
         }
 
-        potionEffects.put(effect.getType(), effect);
+        getPotionEffectsComponent().getPotionEffects().put(effect.getType(), effect);
 
         // todo: this, updated, only players in range
         /*EntityEffectMessage msg = new EntityEffectMessage(getEntityId(), effect.getType().getId(), effect.getAmplifier(), effect.getDuration());
@@ -554,13 +507,15 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
 
     @Override
     public boolean hasPotionEffect(PotionEffectType type) {
-        return potionEffects.containsKey(type);
+        return getPotionEffectsComponent().getPotionEffects().containsKey(type);
     }
 
     @Override
     public void removePotionEffect(PotionEffectType type) {
-        if (!hasPotionEffect(type)) return;
-        potionEffects.remove(type);
+        if (!hasPotionEffect(type)) {
+            return;
+        }
+        getPotionEffectsComponent().getPotionEffects().remove(type);
 
         // todo: this, improved, for players in range
         /*EntityRemoveEffectMessage msg = new EntityRemoveEffectMessage(getEntityId(), type.getId());
@@ -571,30 +526,30 @@ public abstract class GlowLivingEntity extends GlowEntity implements LivingEntit
 
     @Override
     public Collection<PotionEffect> getActivePotionEffects() {
-        return Collections.unmodifiableCollection(potionEffects.values());
+        return Collections.unmodifiableCollection(getPotionEffectsComponent().getPotionEffects().values());
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // Custom name
 
     @Override
-    public void setCustomName(String name) {
-        customName = name;
-    }
-
-    @Override
     public String getCustomName() {
-        return customName;
+        return getNameComponent().getCustomName();
     }
 
     @Override
-    public void setCustomNameVisible(boolean flag) {
-        customNameVisible = flag;
+    public void setCustomName(String name) {
+        getNameComponent().setCustomName(name);
     }
 
     @Override
     public boolean isCustomNameVisible() {
-        return customNameVisible;
+        return getNameComponent().isCustomNameVisible();
+    }
+
+    @Override
+    public void setCustomNameVisible(boolean flag) {
+        getNameComponent().setCustomNameVisible(flag);
     }
 
     ////////////////////////////////////////////////////////////////////////////

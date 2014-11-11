@@ -104,6 +104,7 @@ dependencies {
     //compile 'mysql:mysql-connector-java:5.1.14'
     //compile 'org.xerial:sqlite-jdbc:3.7.2'
     compile 'org.slf4j:slf4j-jdk14:1.7.7'
+    compile "net.onedaybeard.artemis:artemis-odb:0.8.0"
     compile lombok
     testCompile 'junit:junit:4.8.1'
 }
