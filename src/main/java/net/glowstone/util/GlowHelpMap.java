@@ -11,6 +11,8 @@ import org.bukkit.help.*;
 
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * An implementation of {@link HelpMap}.
  */
@@ -59,9 +61,7 @@ public final class GlowHelpMap implements HelpMap {
     @Override
     @SuppressWarnings("unchecked")
     public void registerHelpTopicFactory(Class commandClass, HelpTopicFactory factory) {
-        if (!Command.class.isAssignableFrom(commandClass) && !CommandExecutor.class.isAssignableFrom(commandClass)) {
-            throw new IllegalArgumentException("commandClass must implement either Command or CommandExecutor!");
-        }
+        checkArgument(Command.class.isAssignableFrom(commandClass) || CommandExecutor.class.isAssignableFrom(commandClass), "commandClass must implement either Command or CommandExecutor!");
         topicFactoryMap.put(commandClass, factory);
     }
 

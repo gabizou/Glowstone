@@ -35,6 +35,8 @@ import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.logging.Level;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * A single connection to the server, which may or may not be associated with a
  * player.
@@ -257,9 +259,7 @@ public final class GlowSession extends BasicSession {
      * with this session.
      */
     public void setPlayer(PlayerProfile profile) {
-        if (player != null) {
-            throw new IllegalStateException("Cannot set player twice");
-        }
+        checkState(player == null, "Cannot set player twice");
 
         // isActive check here in case player disconnected during authentication
         if (!isActive()) {

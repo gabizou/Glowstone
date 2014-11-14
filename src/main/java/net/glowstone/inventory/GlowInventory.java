@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * A class which represents an inventory and the items it contains.
  */
@@ -294,9 +296,7 @@ public class GlowInventory implements Inventory {
 
     @Override
     public void setContents(ItemStack[] items) {
-        if (items.length != slots.length) {
-            throw new IllegalArgumentException("Length of items must be " + slots.length);
-        }
+        checkArgument(items.length == slots.length, "Length of items must be " + slots.length);
         System.arraycopy(items, 0, slots, 0, items.length);
     }
 

@@ -19,6 +19,8 @@ import org.bukkit.util.Vector;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class BlockSkull extends BlockType {
 
     public BlockSkull() {
@@ -86,9 +88,7 @@ public class BlockSkull extends BlockType {
     }
 
     public static SkullType getType(int id) {
-        if (id < 0 || id >= SkullType.values().length) {
-            throw new IllegalArgumentException("ID not a Skull type: " + id);
-        }
+        checkArgument(id >= 0 && id < SkullType.values().length , "ID not a Skull type: " + id);
         return SkullType.values()[id];
     }
 

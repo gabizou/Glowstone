@@ -6,6 +6,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * A map for entity metadata.
  */
@@ -44,13 +46,8 @@ public class MetadataMap {
             }
         }
 
-        if (!index.getType().getDataType().isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Cannot assign " + value + " to " + index + ", expects " + index.getType());
-        }
-
-        if (!index.appliesTo(entityClass)) {
-            throw new IllegalArgumentException("Index " + index + " does not apply to " + entityClass.getSimpleName() + ", only " + index.getAppliesTo().getSimpleName());
-        }
+        checkArgument(index.getType().getDataType().isAssignableFrom(value.getClass()), "Cannot assign " + value + " to " + index + ", expects " + index.getType());
+        checkArgument(index.appliesTo(entityClass), "Index " + index + " does not apply to " + entityClass.getSimpleName() + ", only " + index.getAppliesTo().getSimpleName());
 
         Object prev = map.put(index, value);
         if (!Objects.equals(prev, value)) {
@@ -79,9 +76,7 @@ public class MetadataMap {
             return 0;
         }
         Object o = get(index);
-        if (!(o instanceof Number)) {
-            throw new IllegalArgumentException("Index " + index + " is of non-number type " + index.getType());
-        }
+        checkArgument(o instanceof Number, "Index " + index + " is of non-number type " + index.getType());
         return (Number) o;
     }
 
@@ -111,9 +106,7 @@ public class MetadataMap {
 
     @SuppressWarnings("unchecked")
     private <T> T get(MetadataIndex index, MetadataType expected, T def) {
-        if (index.getType() != expected) {
-            throw new IllegalArgumentException("Cannot get " + index + ": is " + index.getType() + ", not " + expected);
-        }
+        checkArgument(index.getType() == expected, "Cannot get " + index + ": is " + index.getType() + ", not " + expected);
         T t = (T) map.get(index);
         if (t == null) {
             return def;

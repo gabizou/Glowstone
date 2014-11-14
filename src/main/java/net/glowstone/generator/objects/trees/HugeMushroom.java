@@ -8,14 +8,14 @@ import org.bukkit.block.BlockState;
 
 import java.util.Random;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class HugeMushroom extends GenericTree {
     private Material type;
 
     public HugeMushroom(Random random, Location location, Material type, BlockStateDelegate delegate) {
         super(random, location, delegate);
-        if (type != Material.HUGE_MUSHROOM_1 && type != Material.HUGE_MUSHROOM_2) {
-            throw new IllegalArgumentException("Invalid huge mushroom type");
-        }
+        checkArgument(type == Material.HUGE_MUSHROOM_1 || type == Material.HUGE_MUSHROOM_2, "Invalid huge mushroom type");
         this.type = type;
         setOverridables(
                 Material.AIR,

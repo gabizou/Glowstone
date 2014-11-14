@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Standard NBT-based player data storage.
  */
@@ -150,9 +152,7 @@ public class NbtPlayerDataService implements PlayerDataService {
         }
 
         private void checkOpen() {
-            if (tag == null) {
-                throw new IllegalStateException("cannot access fields after close");
-            }
+            checkState(tag != null, "Cannot access fields after close");
         }
 
         @Override

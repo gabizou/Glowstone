@@ -5,6 +5,8 @@ import org.apache.commons.lang.Validate;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * The {@code TAG_Compound} tag.
  */
@@ -262,9 +264,7 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
 
     @SuppressWarnings("unchecked")
     private <T extends Tag<?>> T getTag(String key, Class<T> clazz) {
-        if (!is(key, clazz)) {
-            throw new IllegalArgumentException("Compound does not contain " + clazz.getSimpleName() + " \"" + key + "\"");
-        }
+        checkArgument(is(key, clazz), "Compound does not contain " + clazz.getSimpleName() + " \"" + key + "\"");
         return (T) value.get(key);
     }
 
@@ -274,9 +274,7 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
             // empty lists are allowed to be the wrong type
             return Arrays.asList();
         }
-        if (tag.getChildType() != type) {
-            throw new IllegalArgumentException("List \"" + key + "\" contains " + tag.getChildType() + ", not " + type);
-        }
+        checkArgument(tag.getChildType() == type, "List \"" + key + "\" contains " + tag.getChildType() + ", not " + type);
         return tag.getValue();
     }
 }

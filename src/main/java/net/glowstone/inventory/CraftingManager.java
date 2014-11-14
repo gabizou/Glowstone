@@ -10,6 +10,8 @@ import org.bukkit.inventory.*;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Manager for crafting and smelting recipes
  */
@@ -95,9 +97,7 @@ public final class CraftingManager implements Iterable<Recipe> {
     public Recipe getCraftingRecipe(ItemStack[] items) {
         int size = (int) Math.sqrt(items.length);
 
-        if (size * size != items.length) {
-            throw new IllegalArgumentException("ItemStack list was not square (was " + items.length + ")");
-        }
+        checkArgument(size * size == items.length, "ItemStack list was not square (was " + items.length + ")");
 
         ShapedRecipe result = getShapedRecipe(size, items);
         if (result != null) {

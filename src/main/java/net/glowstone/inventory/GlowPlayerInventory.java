@@ -11,6 +11,8 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.util.Arrays;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * An Inventory representing the items a player is holding.
  */
@@ -64,8 +66,7 @@ public class GlowPlayerInventory extends GlowInventory implements PlayerInventor
     }
 
     public void setRawHeldItemSlot(int slot) {
-        if (slot < 0 || slot > 8)
-            throw new IllegalArgumentException(slot + " not in range 0..8");
+        checkArgument(slot >= 0 && slot < 8, slot + " not in range 0..8");
         heldSlot = slot;
         setItemInHand(getItemInHand());  // send to player again just in case
     }
@@ -129,9 +130,8 @@ public class GlowPlayerInventory extends GlowInventory implements PlayerInventor
 
     @Override
     public void setArmorContents(ItemStack[] items) {
-        if (items.length != 4) {
-            throw new IllegalArgumentException("Length of armor must be 4");
-        }
+        checkArgument(items.length == 4, "Length of armor must be 4");
+
         for (int i = 0; i < 4; ++i) {
             setItem(SIZE + i, items[i]);
         }

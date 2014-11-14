@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Represents a human entity, such as an NPC or a player.
  */
@@ -105,9 +107,7 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
     @Override
     public void setUniqueId(UUID uuid) {
         // silently allow setting the same UUID again
-        if (!profile.getUniqueId().equals(uuid)) {
-            throw new IllegalStateException("UUID of " + this + " is already " + profile.getUniqueId());
-        }
+        checkState(profile.getUniqueId().equals(uuid), "UUID of " + this + " is already " + profile.getUniqueId());
     }
 
     @Override

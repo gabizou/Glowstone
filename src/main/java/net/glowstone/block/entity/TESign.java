@@ -9,6 +9,8 @@ import org.bukkit.Material;
 
 import java.util.Arrays;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class TESign extends TileEntity {
 
     private final String[] lines = new String[4];
@@ -17,9 +19,7 @@ public class TESign extends TileEntity {
         super(block);
         setSaveId("Sign");
 
-        if (block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
-            throw new IllegalArgumentException("Sign must be WALL_SIGN or SIGN_POST, got " + block.getType());
-        }
+        checkArgument(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST, "Sign must be WALL_SIGN or SIGN_POST, got " + block.getType());
 
         Arrays.fill(lines, "");
     }
@@ -59,9 +59,7 @@ public class TESign extends TileEntity {
      * @throws IllegalArgumentException If the wrong number of lines is provided.
      */
     public void setLines(String[] text) {
-        if (text.length != lines.length) {
-            throw new IllegalArgumentException("Provided lines were length " + text.length + ", must be " + lines.length);
-        }
+        checkArgument(text.length == lines.length, "Provided lines were length " + text.length + ", must be " + lines.length);
 
         for (int i = 0; i < lines.length; ++i) {
             lines[i] = text[i] == null ? "" : text[i];

@@ -9,6 +9,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Base class for specific types of items.
  */
@@ -27,9 +30,7 @@ public class ItemType {
      * Assign an id number to this ItemType (for internal use only).
      */
     public final void setId(int id) {
-        if (this.id != -1) {
-            throw new IllegalStateException("Id is already set in " + this);
-        }
+        checkState(this.id == -1, "Id is already set in " + this);
         this.id = id;
 
         // pull a few defaults from Material if possible
@@ -83,9 +84,7 @@ public class ItemType {
             this.placeAs = null;
         } else {
             this.placeAs = ItemTable.instance().getBlock(placeAs);
-            if (this.placeAs == null) {
-                throw new IllegalArgumentException("Material " + placeAs + " is not a valid block");
-            }
+            checkArgument(this.placeAs != null, "Material " + placeAs + " is not a valid block");
         }
     }
 

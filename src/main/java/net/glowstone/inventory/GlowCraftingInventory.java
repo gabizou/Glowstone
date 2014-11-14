@@ -10,6 +10,8 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.Arrays;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Represents a crafting grid inventory, both workbench and per-player.
  */
@@ -20,9 +22,7 @@ public class GlowCraftingInventory extends GlowInventory implements CraftingInve
 
     public GlowCraftingInventory(InventoryHolder owner, InventoryType type) {
         super(owner, type);
-        if (type != InventoryType.CRAFTING && type != InventoryType.WORKBENCH) {
-            throw new IllegalArgumentException("GlowCraftingInventory cannot be " + type + ", only CRAFTING or WORKBENCH.");
-        }
+        checkArgument(type == InventoryType.CRAFTING || type == InventoryType.WORKBENCH, "GlowCraftingInventory cannot be " + type + ", only CRAFTING or WORKBENCH.");
 
         slotTypes[RESULT_SLOT] = InventoryType.SlotType.RESULT;
         Arrays.fill(slotTypes, MATRIX_START, getSize(), InventoryType.SlotType.CRAFTING);
@@ -84,9 +84,7 @@ public class GlowCraftingInventory extends GlowInventory implements CraftingInve
 
     @Override
     public void setMatrix(ItemStack[] contents) {
-        if (contents.length != getSize() - 1) {
-            throw new IllegalArgumentException("Length must be " + (getSize() - 1));
-        }
+        checkArgument(contents.length == (getSize() - 1), "Length must be " + (getSize() - 1));
         for (int i = 0; i < contents.length; ++i) {
             setItem(MATRIX_START + i, contents[i]);
         }

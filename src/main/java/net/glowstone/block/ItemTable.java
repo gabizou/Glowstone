@@ -8,6 +8,8 @@ import org.bukkit.Material;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * The lookup table for block and item types.
  */
@@ -197,13 +199,8 @@ public final class ItemTable {
     }
 
     private void reg(Material material, ItemType type) {
-        if (material.isBlock() != (type instanceof BlockType)) {
-            throw new IllegalArgumentException("Cannot mismatch item and block: " + material + ", " + type);
-        }
-
-        if (idToType.containsKey(material.getId())) {
-            throw new IllegalArgumentException("Cannot use " + type + " for " + material + ", is already " + idToType.get(material.getId()));
-        }
+        checkArgument(material.isBlock() == (type instanceof BlockType), "Cannot mismatch item and block: " + material + ", " + type);
+        checkArgument(!idToType.containsKey(material.getId()), "Cannot use " + type + " for " + material + ", is already " + idToType.get(material.getId()));
 
         idToType.put(material.getId(), type);
         type.setId(material.getId());

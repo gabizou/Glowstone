@@ -16,6 +16,9 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import java.util.*;
 import java.util.logging.Level;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Represents a chunk of the map.
  * @author Graham Edgecombe
@@ -118,9 +121,8 @@ public final class GlowChunk implements Chunk {
          * should not be further modified.
          */
         public ChunkSection(char[] types, NibbleArray skyLight, NibbleArray blockLight) {
-            if (types.length != ARRAY_SIZE || skyLight.size() != ARRAY_SIZE || blockLight.size() != ARRAY_SIZE) {
-                throw new IllegalArgumentException("An array length was not " + ARRAY_SIZE + ": " + types.length + " " + skyLight.size() + " " + blockLight.size());
-            }
+            checkArgument(types.length == ARRAY_SIZE && skyLight.size() == ARRAY_SIZE && blockLight.size() == ARRAY_SIZE,
+                    "An array length was not " + ARRAY_SIZE + ": " + types.length + " " + skyLight.size() + " " + blockLight.size());
             this.types = types;
             this.skyLight = skyLight;
             this.blockLight = blockLight;
@@ -429,8 +431,7 @@ public final class GlowChunk implements Chunk {
      * @param type The type.
      */
     public void setType(int x, int z, int y, int type) {
-        if (type < 0 || type >= 256)
-            throw new IllegalArgumentException("Block type out of range: " + type);
+        checkArgument(type >= 0 && type < 256, "Block type out of range: " + type);
 
         ChunkSection section = getSection(y);
         if (section == null) {
@@ -498,8 +499,7 @@ public final class GlowChunk implements Chunk {
      * @param metaData The metadata.
      */
     public void setMetaData(int x, int z, int y, int metaData) {
-        if (metaData < 0 || metaData >= 16)
-            throw new IllegalArgumentException("Metadata out of range: " + metaData);
+        checkArgument(metaData >= 0 && metaData < 16, "Metadata out of range: " + metaData);
         ChunkSection section = getSection(y);
         if (section == null) return;  // can't set metadata on an empty section
         int index = section.index(x, y, z);
@@ -585,12 +585,8 @@ public final class GlowChunk implements Chunk {
      * @param newBiomes The biome array.
      */
     public void setBiomes(byte[] newBiomes) {
-        if (biomes == null) {
-            throw new IllegalStateException("Must initialize chunk first");
-        }
-        if (newBiomes.length != biomes.length) {
-            throw new IllegalArgumentException("Biomes array not of length " + biomes.length);
-        }
+        checkState(biomes != null, "Must initialize chunk first");
+        checkArgument(newBiomes.length != biomes.length, "Biomes array not of length " + biomes.length);
         System.arraycopy(newBiomes, 0, biomes, 0, biomes.length);
     }
 
@@ -721,9 +717,7 @@ public final class GlowChunk implements Chunk {
             }
         }
 
-        if (pos != byteSize) {
-            throw new IllegalStateException("only wrote " + pos + " out of expected " + byteSize + " bytes");
-        }
+        checkState(pos == byteSize, "only wrote " + pos + " out of expected " + byteSize + " bytes");
 
         return new ChunkDataMessage(x, z, entireChunk, sectionBitmask, tileData);
     }

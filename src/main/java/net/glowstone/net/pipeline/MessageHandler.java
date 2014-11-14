@@ -9,6 +9,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Experimental pipeline component, based on flow-net's MessageHandler.
  */
@@ -31,9 +33,7 @@ public final class MessageHandler extends SimpleChannelInboundHandler<Message> {
     public void channelActive(ChannelHandlerContext ctx) {
         final Channel c = ctx.channel();
         Session s = connectionManager.newSession(c);
-        if (!session.compareAndSet(null, s)) {
-            throw new IllegalStateException("Session may not be set more than once");
-        }
+        checkState(session.compareAndSet(null, s), "Session may not be set more than once");
         s.onReady();
     }
 

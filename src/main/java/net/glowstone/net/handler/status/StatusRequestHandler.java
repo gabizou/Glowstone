@@ -13,6 +13,8 @@ import org.json.simple.JSONObject;
 
 import java.net.InetAddress;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public final class StatusRequestHandler implements MessageHandler<GlowSession, StatusRequestMessage> {
 
     @Override
@@ -62,9 +64,7 @@ public final class StatusRequestHandler implements MessageHandler<GlowSession, S
 
         @Override
         public void setServerIcon(CachedServerIcon icon) throws IllegalArgumentException, UnsupportedOperationException {
-            if (!(icon instanceof GlowServerIcon)) {
-                throw new IllegalArgumentException("Icon not provided by this implementation");
-            }
+            checkArgument(icon instanceof GlowServerIcon, "Icon not provided by this implementation");
             this.icon = (GlowServerIcon) icon;
         }
 

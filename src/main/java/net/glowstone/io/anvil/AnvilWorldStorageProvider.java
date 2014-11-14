@@ -10,6 +10,8 @@ import net.glowstone.io.nbt.NbtWorldMetadataService;
 
 import java.io.File;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * A {@link WorldStorageProvider} for the Anvil map format.
  */
@@ -27,8 +29,7 @@ public class AnvilWorldStorageProvider implements WorldStorageProvider {
 
     @Override
     public void setWorld(GlowWorld world) {
-        if (this.world != null)
-            throw new IllegalArgumentException("World is already set");
+        checkArgument(this.world == null, "World is already set");
         this.world = world;
         service = new AnvilChunkIoService(dir);
         meta = new NbtWorldMetadataService(world, dir);

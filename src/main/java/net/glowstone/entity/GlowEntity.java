@@ -32,6 +32,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Represents some entity in the world such as an item on the floor or a player.
  * @author Graham Edgecombe
@@ -366,9 +369,7 @@ public abstract class GlowEntity implements Entity {
      * @param location The new location.
      */
     public void setRawLocation(Location location) {
-        if (location.getWorld() != world) {
-            throw new IllegalArgumentException("Cannot setRawLocation to a different world (got " + location.getWorld() + ", expected " + world + ")");
-        }
+        checkArgument(location.getWorld() == world, "Cannot setRawLocation to a different world (got " + location.getWorld() + ", expected " + world + ")");
         world.getEntityManager().move(this, location);
         Position.copyLocation(location, this.location);
     }
@@ -383,10 +384,10 @@ public abstract class GlowEntity implements Entity {
         Validate.notNull(uuid, "uuid must not be null");
         if (this.uuid == null) {
             this.uuid = uuid;
-        } else if (!this.uuid.equals(uuid)) {
+        } else {
             // silently allow setting the same UUID, since
             // it can't be checked with getUniqueId()
-            throw new IllegalStateException("UUID of " + this + " is already " + this.uuid);
+            checkState(this.uuid.equals(uuid), "UUID of " + this + " is already " + this.uuid);
         }
     }
 

@@ -7,6 +7,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Standard implementation of InventoryView for most inventories.
  */
@@ -68,9 +70,7 @@ public class GlowInventoryView extends InventoryView {
 
         int size = countSlots();
         if (isDefault(this)) size += 4; // armor slots
-        if (slot < 0 || slot >= size) {
-            throw new IllegalArgumentException("Slot out of range [0," + size + "): " + slot);
-        }
+        checkArgument(slot >= 0 && slot < size, "Slot out of range [0," + size + "): " + slot);
     }
 
     @Override

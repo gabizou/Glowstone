@@ -5,6 +5,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ListIterator;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * ListIterator for the contents of an inventory.
  */
@@ -58,9 +60,7 @@ public final class InventoryIterator implements ListIterator<ItemStack> {
 
     @Override
     public void set(ItemStack itemStack) {
-        if (direction == 0) {
-            throw new IllegalStateException("Must call next or previous first");
-        }
+        checkState(direction != 0, "Must call next or previous first");
         int i = direction > 0 ? nextIndex - 1 : nextIndex;
         inventory.setItem(i, itemStack);
     }

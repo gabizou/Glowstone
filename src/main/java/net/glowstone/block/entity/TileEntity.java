@@ -7,6 +7,9 @@ import net.glowstone.entity.GlowPlayer;
 import net.glowstone.util.nbt.CompoundTag;
 import org.bukkit.block.Block;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Base class for tile entities (blocks with NBT data) in the world.
  * Most access to tile entities should occur through the Bukkit BlockState API.
@@ -56,9 +59,7 @@ public abstract class TileEntity {
      * @param saveId The ID.
      */
     protected final void setSaveId(String saveId) {
-        if (this.saveId != null) {
-            throw new IllegalStateException("Can only set saveId once");
-        }
+        checkState(this.saveId == null, "Can only set saveId once");
         this.saveId = saveId;
     }
 
@@ -69,9 +70,7 @@ public abstract class TileEntity {
     public void loadNbt(CompoundTag tag) {
         // verify id and coordinates
         if (saveId != null) {
-            if (!tag.isString("id") || !tag.getString("id").equals(saveId)) {
-                throw new IllegalArgumentException("Expected tile entity id of " + saveId + ", got " + tag.getString("id"));
-            }
+            checkArgument(tag.isString("id") && tag.getString("id").equals(saveId), "Expected tile entity id of " + saveId + ", got " + tag.getString("id"));
         }
 
         // verify coordinates if provided
@@ -80,9 +79,7 @@ public abstract class TileEntity {
             int y = tag.getInt("y");
             int z = tag.getInt("z");
             int rx = block.getX(), ry = block.getY(), rz = block.getZ();
-            if (x != rx || y != ry || z != rz) {
-                throw new IllegalArgumentException("Tried to load tile entity with coords (" + x + "," + y + "," + z + ") into (" + rx + "," + ry + "," + rz + ")");
-            }
+            checkArgument(x == rx && y == ry && z == rz, "Tried to load tile entity with coords (" + x + "," + y + "," + z + ") into (" + rx + "," + ry + "," + rz + ")");
         }
     }
 

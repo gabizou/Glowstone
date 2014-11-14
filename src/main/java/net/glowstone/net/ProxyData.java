@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * Container for proxy (e.g. BungeeCord) player data spoofing.
  */
@@ -30,9 +32,7 @@ public final class ProxyData {
      */
     public ProxyData(GlowSession session, String sourceText) throws Exception {
         String[] parts = sourceText.split("\0");
-        if (parts.length != 3 && parts.length != 4) {
-            throw new IllegalArgumentException("parts length was " + parts.length + ", should be 3 or 4");
-        }
+        checkArgument(parts.length == 3 || parts.length == 4, "parts length was " + parts.length + ", should be 3 or 4");
 
         // Spoof hostname, address, and UUID
         hostname = parts[0];

@@ -3,6 +3,8 @@ package net.glowstone.util.nbt;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * The {@code TAG_List} tag.
  */
@@ -30,9 +32,7 @@ final class ListTag<T extends Tag> extends Tag<List<T>> {
 
         // ensure type of objects in list matches tag type
         for (Tag elem : value) {
-            if (type != elem.getType()) {
-                throw new IllegalArgumentException("ListTag(" + type + ") cannot hold tags of type " + elem.getType());
-            }
+            checkArgument(type == elem.getType(), "ListTag(" + type + ") cannot hold tags of type " + elem.getType());
         }
     }
 

@@ -10,6 +10,8 @@ import org.bukkit.World;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * The class responsible for mapping entity types to their storage methods
  * and reading and writing entity data using those storage methods.
@@ -58,25 +60,17 @@ public final class EntityStorage {
      */
     public static GlowEntity loadEntity(GlowWorld world, CompoundTag compound) {
         // look up the store by the tag's id
-        if (!compound.isString("id")) {
-            throw new IllegalArgumentException("Entity has no type");
-        }
+        checkArgument(compound.isString("id"), "Entity has no type");
         EntityStore<?> store = idTable.get(compound.getString("id"));
-        if (store == null) {
-            throw new IllegalArgumentException("Unknown entity type to load: \"" + compound.getString("id") + "\"");
-        }
+        checkArgument(store != null, "Unknown entity type to load: \"" + compound.getString("id") + "\"");
 
         // verify that, if the tag contains a world, it's correct
         World checkWorld = NbtSerialization.readWorld(world.getServer(), compound);
-        if (checkWorld != null && checkWorld != world) {
-            throw new IllegalArgumentException("Entity in wrong world: stored in " + world + " but data says " + checkWorld);
-        }
+        checkArgument(checkWorld == null || checkWorld == world, "Entity in wrong world: stored in " + world + " but data says " + checkWorld);
 
         // find out the entity's location
         Location location = NbtSerialization.listTagsToLocation(world, compound);
-        if (location == null) {
-            throw new IllegalArgumentException("Entity has no location");
-        }
+        checkArgument(location != null, "Entity has no location");
 
         // create the entity instance and read the rest of the data
         return createEntity(store, location, compound);
@@ -96,10 +90,8 @@ public final class EntityStorage {
      */
     private static EntityStore<?> find(Class<? extends GlowEntity> clazz, String type) {
         EntityStore<?> store = classTable.get(clazz);
-        if (store == null) {
-            // todo: maybe try to look up a parent class's store if one isn't found
-            throw new IllegalArgumentException("Unknown entity type to " + type + ": " + clazz);
-        }
+        // todo: maybe try to look up a parent class's store if one isn't found
+        checkArgument(store != null, "Unknown entity type to " + type + ": " + clazz);
         return store;
     }
 

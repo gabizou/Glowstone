@@ -13,15 +13,15 @@ import org.bukkit.Note;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.NoteBlock;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class GlowNoteBlock extends GlowBlockState implements NoteBlock {
 
     private Note note;
 
     public GlowNoteBlock(GlowBlock block) {
         super(block);
-        if (block.getType() != Material.NOTE_BLOCK) {
-            throw new IllegalArgumentException("GlowNoteBlock: expected NOTE_BLOCK, got " + block.getType());
-        }
+        checkArgument(block.getType() == Material.NOTE_BLOCK, "GlowNoteBlock: expected NOTE_BLOCK, got " + block.getType());
 
         note = getTileEntity().getNote();
     }

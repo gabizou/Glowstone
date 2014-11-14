@@ -7,6 +7,8 @@ import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
  * An implementation of {@link ItemFactory} responsible for creating ItemMetas.
  */
@@ -94,10 +96,8 @@ public final class GlowItemFactory implements ItemFactory {
      * @return The GlowMetaItem.
      */
     private GlowMetaItem toGlowMeta(ItemMeta meta) {
-        if (meta instanceof GlowMetaItem) {
-            return (GlowMetaItem) meta;
-        }
-        throw new IllegalArgumentException("Item meta " + meta + " was not created by GlowItemFactory");
+        checkArgument(meta instanceof GlowMetaItem, "Item meta " + meta + " was not created by GlowItemFactory");
+        return (GlowMetaItem) meta;
     }
 
     /**

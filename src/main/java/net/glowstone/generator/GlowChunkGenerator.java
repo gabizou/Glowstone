@@ -11,6 +11,9 @@ import org.bukkit.util.noise.OctaveGenerator;
 
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Base chunk generator class.
  */
@@ -54,9 +57,7 @@ public abstract class GlowChunkGenerator extends ChunkGenerator {
      * @return A new filled byte[16 * 16 * 128];
      */
     protected byte[] start(Material fill) {
-        if (fill == null) {
-            throw new IllegalArgumentException("Invalid block type!");
-        }
+        checkArgument(fill != null, "Invalid block type!");
         byte[] data = new byte[GlowChunk.HEIGHT * GlowChunk.WIDTH * WORLD_DEPTH];
         Arrays.fill(data, (byte) fill.getId());
         return data;
@@ -71,12 +72,8 @@ public abstract class GlowChunkGenerator extends ChunkGenerator {
      * @param id The block type.
      */
     protected void set(byte[] data, int x, int y, int z, Material id) {
-        if (data == null) {
-            throw new IllegalStateException();
-        }
-        if (id == null) {
-            throw new IllegalArgumentException("Unknown block type!");
-        }
+        checkState(data != null);
+        checkArgument(id != null, "Unknown block type!");
         if (x < 0 || y < 0 || z < 0 || x >= GlowChunk.HEIGHT || y >= GlowChunk.DEPTH || z >= GlowChunk.WIDTH) {
             return;
         }

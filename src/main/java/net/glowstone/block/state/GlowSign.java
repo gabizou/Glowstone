@@ -6,15 +6,15 @@ import net.glowstone.block.entity.TESign;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class GlowSign extends GlowBlockState implements Sign {
 
     private final String[] lines;
 
     public GlowSign(GlowBlock block) {
         super(block);
-        if (block.getType() != Material.WALL_SIGN && block.getType() != Material.SIGN_POST) {
-            throw new IllegalArgumentException("GlowSign: expected WALL_SIGN or SIGN_POST, got " + block.getType());
-        }
+        checkArgument(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST, "GlowSign: expected WALL_SIGN or SIGN_POST, got " + block.getType());
         lines = getTileEntity().getLines();
     }
 

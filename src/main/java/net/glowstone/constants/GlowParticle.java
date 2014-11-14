@@ -6,6 +6,7 @@ import org.bukkit.material.MaterialData;
 
 import java.util.Arrays;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.bukkit.Particle.*;
 
 /**
@@ -42,17 +43,13 @@ public final class GlowParticle {
             case ITEM_BREAK:
             case BLOCK_BREAK:
             case BLOCK_DUST:
-                if (material == null) {
-                    throw new IllegalArgumentException("Particle " + particle + " requires material, null provided");
-                }
+                checkArgument(material != null, "Particle " + particle + " requires material, null provided");
                 if (particle == ITEM_BREAK) {
                     return new int[]{material.getItemTypeId(), material.getData()};
                 }
                 return new int[]{material.getItemTypeId()};
             default:
-                if (material != null) {
-                    throw new IllegalArgumentException("Particle " + particle + " does not use material, " + material + " provided");
-                }
+                checkArgument(material == null, "Particle " + particle + " does not use material, " + material + " provided");
                 return EMPTY;
         }
     }

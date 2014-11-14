@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 @Data
 public final class UserListItemMessage implements Message {
 
@@ -20,9 +22,7 @@ public final class UserListItemMessage implements Message {
         this.entries = entries;
 
         for (Entry entry : entries) {
-            if (entry.action != action) {
-                throw new IllegalArgumentException("Entries must be " + action + ", not " + entry.action);
-            }
+            checkArgument(entry.action == action, "Entries must be " + action + ", not " + entry.action);
         }
     }
 
