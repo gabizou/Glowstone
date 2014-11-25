@@ -326,11 +326,11 @@ public final class GlowWorld implements World {
         artemisWorld.setSystem(new AngerSystem());
         artemisWorld.setSystem(new ExpireableLifetimeSystem());
         artemisWorld.setSystem(new FallSystem());
+        artemisWorld.setSystem(new GravitySystem());
         artemisWorld.setSystem(new EntitySystem());
         artemisWorld.setSystem(new PlayerSystem());
         artemisWorld.setSystem(new InvincibilitySystem());
-        artemisWorld.setSystem(new BreathingSystem());
-        artemisWorld.setSystem(new GravitySystem());
+        //artemisWorld.setSystem(new BreathingSystem());
         artemisWorld.setSystem(new PotionEffectSystem());
         artemisWorld.setSystem(new SleepSystem());
         artemisWorld.setSystem(new PickupDelaySystem());
