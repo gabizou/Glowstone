@@ -27,8 +27,9 @@ public class GravitySystem extends EntityProcessingSystem {
         GlowEntityComponent glowEntityComponent = entityMapper.get(e);
         LocationComponent locationComponent = locationMapper.get(e);
         if (lifeComponent.getTicksLived() >= 100) {
-            if (locationComponent.getLocation().clone().subtract(0, 1, 0).getBlock().getType() == Material.AIR) {
-                locationComponent.getLocation().subtract(0, 1, 0);
+            if (locationComponent.getLocation().clone().subtract(0, 0.08, 0).getBlock().getType() == Material.AIR) {
+                //TODO Apply velocity here
+                locationComponent.getLocation().subtract(0, 0.08, 0);
             }
         }
     }
