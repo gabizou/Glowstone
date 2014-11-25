@@ -88,8 +88,9 @@ public final class EntityManager implements Iterable<GlowEntity> {
         entity.id = id;
         entities.put(id, entity);
         ((Collection<GlowEntity>) getAll(entity.getClass())).add(entity);
-        ((GlowChunk) entity.location.getChunk()).getRawEntities().add(entity);
+        ((GlowChunk) entity.getLocation().getChunk()).getRawEntities().add(entity);
         lastId = id;
+        //System.out.println("ALLOCATED " + entity);
     }
 
     /**
@@ -99,7 +100,7 @@ public final class EntityManager implements Iterable<GlowEntity> {
     void deallocate(GlowEntity entity) {
         entities.remove(entity.id);
         getAll(entity.getClass()).remove(entity);
-        ((GlowChunk) entity.location.getChunk()).getRawEntities().remove(entity);
+        ((GlowChunk) entity.getLocation().getChunk()).getRawEntities().remove(entity);
     }
 
     /**
@@ -109,7 +110,7 @@ public final class EntityManager implements Iterable<GlowEntity> {
      * @param newLocation The new location.
      */
     void move(GlowEntity entity, Location newLocation) {
-        Chunk prevChunk = entity.location.getChunk();
+        Chunk prevChunk = entity.getLocation().getChunk();
         Chunk newChunk = newLocation.getChunk();
         if (prevChunk != newChunk) {
             ((GlowChunk) prevChunk).getRawEntities().remove(entity);

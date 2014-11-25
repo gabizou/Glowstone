@@ -1,8 +1,12 @@
 package net.glowstone.entity;
 
+import com.artemis.ComponentMapper;
 import com.flowpowered.networking.Message;
-import net.glowstone.inventory.*;
+import net.glowstone.entity.components.GameModeComponent;
+import net.glowstone.entity.components.InventoryViewComponent;
+import net.glowstone.entity.components.SleepingComponent;
 import net.glowstone.entity.meta.profile.PlayerProfile;
+import net.glowstone.inventory.*;
 import net.glowstone.net.message.play.entity.EntityEquipmentMessage;
 import net.glowstone.net.message.play.entity.EntityHeadRotationMessage;
 import net.glowstone.net.message.play.entity.SpawnPlayerMessage;
@@ -49,39 +53,19 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
     private final GlowInventory enderChest = new GlowInventory(this, InventoryType.ENDER_CHEST);
 
     /**
-     * The item the player has on their cursor.
-     */
-    private ItemStack itemOnCursor;
-
-    /**
-     * Whether this human is sleeping or not.
-     */
-    protected boolean sleeping = false;
-
-    /**
-     * How long this human has been sleeping.
-     */
-    private int sleepingTicks = 0;
-
-    /**
      * This human's PermissibleBase for permissions.
      */
     protected PermissibleBase permissions;
+    /**
+     * The item the player has on their cursor.
+     */
+    private ItemStack itemOnCursor;
 
     /**
      * Whether this human is considered an op.
      */
     private boolean isOp;
 
-    /**
-     * The player's active game mode
-     */
-    private GameMode gameMode;
-
-    /**
-     * The player's currently open inventory
-     */
-    private InventoryView inventoryView;
 
     /**
      * Creates a human within the specified world and with the specified name.
@@ -90,13 +74,36 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
      */
     public GlowHumanEntity(Location location, PlayerProfile profile) {
         super(location);
+        GameModeComponent gameMode = new GameModeComponent();
+        gameMode.setGamemode(server.getDefaultGameMode());
+
+        InventoryViewComponent inventoryViewComponent = new InventoryViewComponent();
+
         this.profile = profile;
         permissions = new PermissibleBase(this);
-        gameMode = server.getDefaultGameMode();
 
-        inventoryView = new GlowInventoryView(this);
+        InventoryView inventoryView = new GlowInventoryView(this);
         addViewer(inventoryView.getTopInventory());
         addViewer(inventoryView.getBottomInventory());
+        inventoryViewComponent.setInventoryView(inventoryView);
+        getArtemisEntity().edit()
+                .add(gameMode)
+                .add(inventoryViewComponent)
+                .add(new SleepingComponent()).getEntity();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Artemis getters and setters.
+    protected GameModeComponent getGameModeComponent() {
+        return ComponentMapper.getFor(GameModeComponent.class, this.getArtemisEntity().getWorld()).get(this.getArtemisEntity());
+    }
+
+    protected InventoryViewComponent getInventoryViewComponent() {
+        return ComponentMapper.getFor(InventoryViewComponent.class, this.getArtemisEntity().getWorld()).get(this.getArtemisEntity());
+    }
+
+    protected SleepingComponent getSleepingComponent() {
+        return ComponentMapper.getFor(SleepingComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -114,13 +121,14 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
     public List<Message> createSpawnMessage() {
         List<Message> result = new LinkedList<>();
 
+        Location location = getLocation();
         // spawn player
         int x = Position.getIntX(location);
         int y = Position.getIntY(location);
         int z = Position.getIntZ(location);
         int yaw = Position.getIntYaw(location);
         int pitch = Position.getIntPitch(location);
-        result.add(new SpawnPlayerMessage(id, profile.getUniqueId(), x, y, z, yaw, pitch, 0, metadata.getEntryList()));
+        result.add(new SpawnPlayerMessage(id, profile.getUniqueId(), x, y, z, yaw, pitch, 0, getMetadataComponent().getMetadata().getEntryList()));
 
         // head facing
         result.add(new EntityHeadRotationMessage(id, yaw));
@@ -132,16 +140,6 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
             result.add(new EntityEquipmentMessage(id, i + 1, equipment.getArmorContents()[i]));
         }
         return result;
-    }
-
-    @Override
-    public void pulse() {
-        super.pulse();
-        if (sleeping) {
-            ++sleepingTicks;
-        } else {
-            sleepingTicks = 0;
-        }
     }
 
     /**
@@ -167,22 +165,22 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
 
     @Override
     public boolean isSleeping() {
-        return sleeping;
+        return getSleepingComponent().isSleeping();
     }
 
     @Override
     public int getSleepTicks() {
-        return sleepingTicks;
+        return getSleepingComponent().getSleepingTicks();
     }
 
     @Override
     public GameMode getGameMode() {
-        return gameMode;
+        return getGameModeComponent().getGamemode();
     }
 
     @Override
     public void setGameMode(GameMode mode) {
-        gameMode = mode;
+        getGameModeComponent().setGamemode(mode);
     }
 
     @Override
@@ -273,8 +271,8 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
     // Health
 
     @Override
-    protected boolean canDrown() {
-        return gameMode == GameMode.SURVIVAL || gameMode == GameMode.ADVENTURE;
+    public boolean canDrown() {
+        return getGameModeComponent().canDrown();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -313,12 +311,12 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
     @Override
     public boolean setWindowProperty(InventoryView.Property prop, int value) {
         // nb: does not actually send anything
-        return prop.getType() == inventoryView.getType();
+        return prop.getType() == getInventoryViewComponent().getInventoryView().getType();
     }
 
     @Override
     public InventoryView getOpenInventory() {
-        return inventoryView;
+        return getInventoryViewComponent().getInventoryView();
     }
 
     @Override
@@ -354,13 +352,14 @@ public abstract class GlowHumanEntity extends GlowLivingEntity implements HumanE
     public void openInventory(InventoryView inventory) {
         Validate.notNull(inventory);
         this.inventory.getDragTracker().reset();
-
+        InventoryViewComponent component = getInventoryViewComponent();
+        InventoryView temp = component.getInventoryView();
         // stop viewing the old inventory and start viewing the new one
-        removeViewer(inventoryView.getTopInventory());
-        removeViewer(inventoryView.getBottomInventory());
-        inventoryView = inventory;
-        addViewer(inventoryView.getTopInventory());
-        addViewer(inventoryView.getBottomInventory());
+        removeViewer(temp.getTopInventory());
+        removeViewer(temp.getBottomInventory());
+        component.setInventoryView(inventory);
+        addViewer(inventory.getTopInventory());
+        addViewer(inventory.getBottomInventory());
     }
 
     @Override

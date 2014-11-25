@@ -1,6 +1,9 @@
 package net.glowstone.entity.passive;
 
+import com.artemis.ComponentMapper;
 import com.flowpowered.networking.Message;
+import net.glowstone.entity.components.BooleanAngerComponent;
+import net.glowstone.entity.components.DyeableComponent;
 import net.glowstone.entity.meta.MetadataIndex;
 import net.glowstone.entity.meta.MetadataMap;
 import net.glowstone.net.message.play.entity.EntityMetadataMessage;
@@ -24,43 +27,53 @@ public class GlowWolf extends GlowTameable implements Wolf {
 
     protected GlowWolf(Location location, AnimalTamer owner) {
         super(location, EntityType.WOLF, owner);
+        getArtemisEntity().edit()
+                .add(new DyeableComponent(DyeColor.RED))
+                .add(new BooleanAngerComponent());
+    }
+
+    protected DyeableComponent getDyeableComponent() {
+        return ComponentMapper.getFor(DyeableComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
+    }
+
+    protected BooleanAngerComponent getAngerComponent() {
+        return ComponentMapper.getFor(BooleanAngerComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
     }
 
     @Override
     public boolean isAngry() {
-        return angry;
+        return getAngerComponent().isAngry();
     }
 
     @Override
     public void setAngry(boolean angry) {
-        this.angry = angry;
+        getAngerComponent().setAngry(angry);
     }
 
     @Override
     public boolean isSitting() {
-        return sitting;
+        return getTameableComponent().isSitting();
     }
 
     @Override
     public void setSitting(boolean sitting) {
-        this.sitting = sitting;
+        getTameableComponent().setSitting(sitting);
     }
 
     @Override
     public DyeColor getCollarColor() {
-        return collarColor;
+        return this.getDyeableComponent().getDyeColor();
     }
 
     @Override
     public void setCollarColor(DyeColor dyeColor) {
-        this.collarColor = dyeColor;
+        this.getDyeableComponent().setDyeColor(dyeColor);
     }
 
     @Override
     public List<Message> createSpawnMessage() {
         List<Message> messages = super.createSpawnMessage();
-        MetadataMap map = new MetadataMap(GlowWolf.class);
-
+        MetadataMap map = getMetadataComponent().getMetadata();
         map.set(MetadataIndex.WOLF_COLOR, getColorByte());
         messages.add(new EntityMetadataMessage(id, map.getEntryList()));
         return messages;

@@ -1,58 +1,60 @@
 package net.glowstone.entity.monsters;
 
+import com.artemis.ComponentMapper;
 import net.glowstone.entity.GlowMonster;
+import net.glowstone.entity.components.ZombieComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Zombie;
 
 public class GlowZombie extends GlowMonster implements Zombie {
-
-    private boolean isBaby = false;
-    private boolean isVillager = false;
-    private boolean canBreakDoors = true;
-    private int conversionTime;
-
+    
     public GlowZombie(Location location) {
-        super(location, EntityType.ZOMBIE);
+        this(location, EntityType.ZOMBIE);
+    }
+    protected GlowZombie(Location location, EntityType type) {
+        super(location, type);
+        getArtemisEntity().edit()
+                .add(new ZombieComponent());
     }
 
-    GlowZombie(Location location, EntityType type) {
-        super(location, type);
+    protected ZombieComponent getZombieComponent() {
+        return ComponentMapper.getFor(ZombieComponent.class, getArtemisEntity().getWorld()).get(getArtemisEntity());
     }
 
     @Override
     public boolean isBaby() {
-        return isBaby;
+        return getZombieComponent().isBaby();
     }
 
     @Override
     public void setBaby(boolean isBaby) {
-        this.isBaby = isBaby;
+        getZombieComponent().setBaby(isBaby);
     }
 
     @Override
     public boolean isVillager() {
-        return isVillager;
+        return getZombieComponent().isVillager();
     }
 
     @Override
     public void setVillager(boolean isVillager) {
-        this.isVillager = isVillager;
+        getZombieComponent().setVillager(isVillager);
     }
 
     public int getConversionTime() {
-        return conversionTime;
+        return getZombieComponent().getConversionTime();
     }
 
     public void setConversionTime(int time) {
-        this.conversionTime = time;
+        getZombieComponent().setConversionTime(time);
     }
 
     public boolean canBreakDoors() {
-        return canBreakDoors;
+        return getZombieComponent().isCanBreakDoors();
     }
 
     public void setCanBreakDoors(boolean canBreakDoors) {
-        this.canBreakDoors = canBreakDoors;
+        getZombieComponent().setCanBreakDoors(canBreakDoors);
     }
 }
